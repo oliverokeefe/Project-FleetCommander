@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "ES6",
+    "target": "ES6",
+    "lib": [
+      "ES6",
+      "dom"
+    ],
+    "sourceMap": true,
+    "outDir": "./public/javascripts/"
+  },
+  "include": [
+    "./src",
+    "../shared/src"
+  ]
+}

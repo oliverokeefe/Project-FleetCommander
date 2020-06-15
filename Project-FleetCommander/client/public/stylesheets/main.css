@@ -1,0 +1,32 @@
+body {
+    font-family:      'Segoe UI', sans-serif;
+    color:            #e6e6e6;
+    background-color: #262626;
+    padding-left:     5px;
+}
+
+label {
+
+}
+
+.nodisp {
+    display: none;
+}
+
+.configSection {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    justify-content: flex-end;
+}
+
+.configSectionTopInput {
+    flex-grow: 1;
+}
+
+.label {
+    min-width: 60px;
+    display: inline-block;
+    text-align: right;
+}
+

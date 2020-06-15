@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>Drag Drop Test</title>
+        <style>
+            #div1 {
+                width: 350px;
+                height: 70px;
+                padding: 10px;
+                border: 1px solid #aaaaaa;
+            }
+
+            .player {
+                width: 50px;
+                height: 25px;
+                background-color: lightblue;
+            }
+
+            .container {
+                display: flex;
+                justify-content: space-around;
+                flex-direction: column;
+                flex-wrap: wrap;
+                width: 350px;
+                height: 70px;
+                padding: 10px;
+                border: 1px solid #aaaaaa;
+            }
+
+            .playerList {
+                display: flex;
+                justify-content: space-around;
+                align-content: flex-start;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 70px;
+                height: 500px;
+                padding: 10px;
+                border: 1px solid #aaaaaa;
+            }
+        </style>
+        <script>
+            function allowDrop(ev) {
+              ev.preventDefault();
+            }
+
+            function drag(ev) {
+              ev.dataTransfer.setData("text", ev.target.id);
+            }
+
+            function drop(ev) {
+              ev.preventDefault();
+              var data = ev.dataTransfer.getData("text");
+              if(document.getElementById(data).className === "player"){
+	              ev.target.appendChild(document.getElementById(data));
+                  document.getElementById("output").innerText = document.getElementById(data).getAttribute("game-location");
+              }
+
+            }
+        </script>
+    </head>
+    <body>
+
+        <p>Drag the W3Schools image into the rectangle:</p>
+
+        <div id="div1" class="container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <br>
+        <div class="playerList" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div id="player1" class="player" game-location="1" draggable="true" ondragstart="drag(event)">1</div>
+            <div id="player2" class="player" game-location="2" draggable="true" ondragstart="drag(event)">2</div>
+            <div id="player3" class="player" game-location="3" draggable="true" ondragstart="drag(event)">3</div>
+            <div id="player4" class="player" game-location="4" draggable="true" ondragstart="drag(event)">4</div>
+            <div id="player5" class="player" game-location="5" draggable="true" ondragstart="drag(event)">5</div>
+        </div>
+        <div id="output"></div>
+
+    </body>
+</html>

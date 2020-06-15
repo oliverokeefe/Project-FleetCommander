@@ -1,0 +1,27 @@
+body {
+    font-family:      'Segoe UI', sans-serif;
+    color:            #e6e6e6;
+    background-color: #262626;
+    padding-left:     5px;
+}
+
+
+.Output {
+    margin-top: 10px;
+    margin-left: 10px
+}
+
+
+
+
+.PlayerControl {
+    height: 30px;
+}
+
+.PlayerContainer {
+    height: 100%;
+}
+
+.PlayerLabel {
+    margin-right: 10px;
+}

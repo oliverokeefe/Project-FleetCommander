@@ -1,0 +1,37 @@
+body {
+    font-family:      'Segoe UI', sans-serif;
+    color:            #e6e6e6;
+    background-color: #262626;
+    padding-left:     5px;
+}
+
+.PlayersContainerCore {
+    display: flex;
+}
+
+.PlayerControlContainer {
+
+}
+
+.PlayerControlContainerCore {
+
+}
+
+.Section {
+}
+
+.InputContainer {
+
+}
+
+.PlayerName {
+}
+
+.PlayerVitals {
+
+}
+
+.PlayerStats {
+
+}
+

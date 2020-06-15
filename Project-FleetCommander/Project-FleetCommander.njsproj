@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>Project-FleetCommander</Name>
+    <RootNamespace>Project-FleetCommander</RootNamespace>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>0dac3f4e-27ea-4e38-833c-5dd3fc85f660</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>server/server</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <NodejsPort>1337</NodejsPort>
+    <EnableTypeScript>true</EnableTypeScript>
+    <StartWebBrowser>True</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="client\public\javascripts\client\src\classes\devPlayerControl.js" />
+    <Content Include="client\public\javascripts\client\src\classes\PriorityQueue.js" />
+    <Content Include="client\public\javascripts\client\src\classes\testControl.js" />
+    <Content Include="client\public\javascripts\client\src\classes\testData.js" />
+    <Content Include="client\public\javascripts\client\src\scripts\devScript.js" />
+    <Content Include="client\public\javascripts\client\src\scripts\main.js" />
+    <Content Include="client\public\javascripts\client\src\scripts\testScript.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\Actions.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\Dice.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\Game.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\Player.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\testAction.js" />
+    <Content Include="client\public\javascripts\shared\src\classes\testPlayer.js" />
+    <Content Include="client\public\javascripts\shared\src\types\types.js" />
+    <Content Include="client\public\stylesheets\devStyle.css" />
+    <Content Include="client\public\stylesheets\main.css" />
+    <Content Include="client\public\stylesheets\testStyle.css" />
+    <Content Include="client\public\views\createGame.html" />
+    <Content Include="client\public\views\createPlayer.html" />
+    <Content Include="client\public\views\devPage.html" />
+    <Content Include="client\public\views\dragAndDropTest.html" />
+    <Content Include="client\public\views\index.html" />
+    <Content Include="client\public\views\player.html" />
+    <Content Include="client\public\views\testPage.html" />
+    <Content Include="client\tsconfig.json" />
+    <Content Include="libman.json" />
+    <Content Include="server\tsconfig.json" />
+    <Content Include="tsconfig.json" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="client\" />
+    <Folder Include="client\public\" />
+    <Folder Include="client\public\javascripts\" />
+    <Folder Include="client\public\javascripts\client\" />
+    <Folder Include="client\public\javascripts\client\src\" />
+    <Folder Include="client\public\javascripts\client\src\classes\" />
+    <Folder Include="client\public\javascripts\client\src\scripts\" />
+    <Folder Include="client\public\javascripts\shared\" />
+    <Folder Include="client\public\javascripts\shared\src\" />
+    <Folder Include="client\public\javascripts\shared\src\classes\" />
+    <Folder Include="client\public\javascripts\shared\src\types\" />
+    <Folder Include="client\public\stylesheets\" />
+    <Folder Include="client\public\views\" />
+    <Folder Include="client\src\" />
+    <Folder Include="client\src\classes\" />
+    <Folder Include="client\src\scripts\" />
+    <Folder Include="server\" />
+    <Folder Include="server\routes\" />
+    <Folder Include="shared\" />
+    <Folder Include="shared\src\" />
+    <Folder Include="shared\src\classes\" />
+    <Folder Include="shared\src\types\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="client\src\classes\devPlayerControl.ts" />
+    <TypeScriptCompile Include="client\src\classes\PriorityQueue.ts" />
+    <TypeScriptCompile Include="client\src\classes\testControl.ts" />
+    <TypeScriptCompile Include="client\src\classes\testData.ts" />
+    <TypeScriptCompile Include="client\src\scripts\devScript.ts" />
+    <TypeScriptCompile Include="client\src\scripts\main.ts" />
+    <TypeScriptCompile Include="client\src\scripts\testScript.ts" />
+    <TypeScriptCompile Include="server\routes\classes.ts" />
+    <TypeScriptCompile Include="server\routes\scripts.ts" />
+    <TypeScriptCompile Include="server\routes\testRoute.ts" />
+    <TypeScriptCompile Include="server\routes\types.ts" />
+    <TypeScriptCompile Include="server\server.ts" />
+    <TypeScriptCompile Include="shared\src\classes\Actions.ts" />
+    <TypeScriptCompile Include="shared\src\classes\Dice.ts" />
+    <TypeScriptCompile Include="shared\src\classes\Game.ts" />
+    <TypeScriptCompile Include="shared\src\classes\Player.ts" />
+    <TypeScriptCompile Include="shared\src\classes\testAction.ts" />
+    <TypeScriptCompile Include="shared\src\classes\testPlayer.ts" />
+    <TypeScriptCompile Include="shared\src\types\types.ts" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

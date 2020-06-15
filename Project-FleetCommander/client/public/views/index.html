@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Create Game</title>
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/javascripts/client/src/scripts/main.js"></script>
+</head>
+<body>
+
+    <!-- Game and Character Creation -->
+    <div id="config">
+        <h1>Welcome to Murderdome</h1>
+
+        <div id="gameCreation">
+            <h2>Game Settings</h2>
+            <div id="gameConfig">
+                <input id="gameNameInput" type="text" value="game1"/>
+            </div>
+
+        </div>
+
+        <div id="playerCreation">
+            <h2>Create Player</h2>
+            <div id="playerConfig" class="configSection">
+                <div class="configSectionTopInput">
+                    <div class="label">Name: </div>
+                    <input id="nameInput" name="playerName" type="text" value="Player1" />
+                </div>
+                <div>
+                    <div class="label">Str: </div>
+                    <input id="strInput" name="strength" type="number" value="13" />
+                </div>
+                <div>
+                    <div class="label">Dex: </div>
+                    <input id="dexInput" name="dexterity" type="number" value="13" />
+                </div>
+                <div>
+                    <div class="label">Con: </div>
+                    <input id="conInput" name="constitution" type="number" value="12" />
+                </div>
+                <div>
+                    <div class="label">Int: </div>
+                    <input id="intInput" name="intelligence" type="number" value="12" />
+                </div>
+                <div>
+                    <div class="label">Wis: </div>
+                    <input id="wisInput" name="wisdom" type="number" value="11" />
+                </div>
+                <div>
+                    <div class="label">Cha: </div>
+                    <input id="chaInput" name="charisma" type="number" value="11" />
+                </div>
+            </div>
+        </div>
+
+        <div id="configOutput"></div>
+
+    </div>
+
+    <!-- Actual game -->
+    <div id="Game" class="nodisp">
+
+    </div>
+    
+
+
+
+</body>
+</html>

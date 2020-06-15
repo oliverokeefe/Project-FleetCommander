@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "./client" },
+    { "path": "./server" }
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
