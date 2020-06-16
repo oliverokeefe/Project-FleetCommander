@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
 const express = require("express");
 const path = require("path");
-const Player_1 = require("../shared/src/classes/Player");
 const app = express();
 let http = require('http').createServer(app);
 let io = require('socket.io')(http);
@@ -109,15 +108,6 @@ io.on('connection', (socket) => {
         //    game: games
         //});
         //socket.broadcast.to(game).emit('message', { msg: "There" });
-        let stats = {
-            str: 13,
-            dex: 13,
-            con: 12,
-            int: 12,
-            wis: 11,
-            cha: 11
-        };
-        let player = new Player_1.Player("theID", "Player1", stats);
         //io.sockets.in(socket.game).emit('message', "ALL", player);
         console.log('Player Joined Game: ' + game);
         console.log(games);

@@ -7,7 +7,7 @@
       "dom"
     ],
     "sourceMap": true,
-    "outDir": "./public/javascripts/"
+    "outDir": "./public/scripts/"
   },
   "include": [
     "./src",
