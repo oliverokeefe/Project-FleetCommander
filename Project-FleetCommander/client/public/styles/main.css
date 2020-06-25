@@ -5,28 +5,30 @@ body {
     padding-left:     5px;
 }
 
-label {
-
-}
-
 .nodisp {
     display: none;
 }
 
-.configSection {
-    display: flex;
-    flex-direction: column;
-    min-height: 200px;
-    justify-content: flex-end;
+#ChatLog {
+    width: 500px;
+    height: 400px;
+    border: 3px solid white;
+    margin: 5px 0px;
+    padding: 3px;
+
+/*    display:flex;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    justify-content:flex-end;*/
+
+    overflow:auto;
 }
 
-.configSectionTopInput {
-    flex-grow: 1;
+#ChatLogTop {
+    height:100%
 }
 
-.label {
-    min-width: 60px;
-    display: inline-block;
-    text-align: right;
+#ChatInput {
+    width: 494px;
+    margin-left: 5px;
 }
-

@@ -1,43 +1,60 @@
 
 import type { stats, statKey } from '../../../shared/src/types/types';
 
-let input: HTMLInputElement = undefined;
-let button: HTMLButtonElement = undefined;
+let socket: SocketIOClient.Socket = undefined;
 
+let chatLog: HTMLDivElement = undefined;
+let chatInput: HTMLInputElement = undefined;
 
-function inputHandler(): void {
+function getMessage(message: string): void {
+
+    let messageDiv: HTMLDivElement = document.createElement("div");
+    messageDiv.innerText = message;
+    chatLog.appendChild(messageDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+    return;
+}
+
+function sendMessage(message: string): void {
+    socket.emit('chat', message);
     return;
 }
 
 
-function buttonHandler(): void {
-    if (input) {
-        console.log(input.value);
-    }
-    return;
-}
 
 
 function populateDOMElementVariables() {
-
-    input = document.getElementById("Name") as HTMLInputElement;
-    button = document.getElementById("Enter") as HTMLButtonElement;
-
+    chatLog = document.getElementById("ChatLog") as HTMLDivElement;
+    chatInput = document.getElementById("ChatInput") as HTMLInputElement;
     return;
 }
 
 function addHandlers() {
 
-    button.addEventListener("click", buttonHandler);
+    chatInput.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (event.key === "Enter") {
+            console.log("It worked??!!!??!!");
+            sendMessage(chatInput.value);
+            chatInput.value = "";
+        }
+    });
+    //button.addEventListener("click", buttonHandler);
 
     return;
 }
 
+function setUpSocket() {
+    socket = io();
+    socket.on('chat', getMessage);
+    return;
+}
 
 function init() {
 
     populateDOMElementVariables();
     addHandlers();
+    setUpSocket();
 
     console.log("initialized");
     return;
