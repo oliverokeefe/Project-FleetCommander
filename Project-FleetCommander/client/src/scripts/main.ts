@@ -1,18 +1,81 @@
 
-import type { stats, statKey } from '../../../shared/src/types/types';
+import type { joinData, game } from '../../../shared/src/types/types';
 
 let socket: SocketIOClient.Socket = undefined;
 
-let chatLog: HTMLDivElement = undefined;
+let Game: string = "";
+let Player: string = "";
+
+
+let gameNameDisplay: HTMLDivElement = undefined;
+let playerNameDisplay: HTMLDivElement = undefined;
+
+
+let gameInput: HTMLInputElement = undefined;
+let playerInput: HTMLInputElement = undefined;
+let joinBtn: HTMLButtonElement = undefined;
+
+
+let chatLogDisplay: HTMLDivElement = undefined;
 let chatInput: HTMLInputElement = undefined;
+
+
+function clearGame(): void {
+    gameNameDisplay.innerText = "";
+    playerNameDisplay.innerText = "";
+    clearChatLog();
+    return;
+}
+
+function clearChatLog(): void {
+    chatLogDisplay.innerHTML = "";
+    let chatLogTop: HTMLDivElement = document.createElement('div');
+    chatLogTop.id = "ChatLogTop";
+    chatLogDisplay.appendChild(chatLogTop);
+    return;
+}
+
+function leaveGame(): void {
+    socket.emit('leaveGame');
+    return;
+}
+
+function displayMessage(message: string): void {
+    let messageDiv: HTMLDivElement = document.createElement("div");
+    messageDiv.innerText = message;
+    chatLogDisplay.appendChild(messageDiv);
+}
+
+function updateChat(chatLog: string[]): void {
+    chatLog.forEach((message) => {
+        displayMessage(message);
+    });
+
+    chatLogDisplay.scrollTop = chatLogDisplay.scrollHeight;
+    return;
+}
+
+function updateGameInfo(game: game): void {
+    gameNameDisplay.innerText = game.name;
+}
+
+function updatePlayerInfo(player: string): void {
+    playerNameDisplay.innerText = player;
+}
 
 function getMessage(message: string): void {
 
-    let messageDiv: HTMLDivElement = document.createElement("div");
-    messageDiv.innerText = message;
-    chatLog.appendChild(messageDiv);
-    chatLog.scrollTop = chatLog.scrollHeight;
+    displayMessage(message);
+    chatLogDisplay.scrollTop = chatLogDisplay.scrollHeight;
 
+    return;
+}
+
+function joinGame(game: game, player: string): void {
+    clearGame();
+    updateChat(game.chatLog);
+    updateGameInfo(game)
+    updatePlayerInfo(player)
     return;
 }
 
@@ -21,25 +84,61 @@ function sendMessage(message: string): void {
     return;
 }
 
+function chatInputHandler(event: KeyboardEvent): void {
+    if (event.key === "Enter") {
+        sendMessage(chatInput.value);
+        chatInput.value = "";
+    }
+    return;
+}
+
+function joinBtnHandler(): void {
+    let joinData: joinData = {
+        game: "",
+        player: ""
+    };
+
+    if (gameInput && playerInput) {
+        joinData.game = gameInput.value.trim();
+        joinData.player = playerInput.value.trim();
+    }
+
+    if (joinData.game && joinData.player) {
+        socket.emit('leaveGame');
+        socket.emit('joinGame', joinData);
+    }
+    //else error
+
+
+
+    return;
+}
+
 
 
 
 function populateDOMElementVariables() {
-    chatLog = document.getElementById("ChatLog") as HTMLDivElement;
+    gameNameDisplay = document.getElementById("GameName") as HTMLDivElement;
+    playerNameDisplay = document.getElementById("PlayerName") as HTMLDivElement;
+
+
+    chatLogDisplay = document.getElementById("ChatLog") as HTMLDivElement;
     chatInput = document.getElementById("ChatInput") as HTMLInputElement;
+
+
+    gameInput = document.getElementById("GameInput") as HTMLInputElement;
+    playerInput = document.getElementById("PlayerInput") as HTMLInputElement;
+    joinBtn = document.getElementById("JoinBtn") as HTMLButtonElement;
+
     return;
 }
 
 function addHandlers() {
 
-    chatInput.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (event.key === "Enter") {
-            console.log("It worked??!!!??!!");
-            sendMessage(chatInput.value);
-            chatInput.value = "";
-        }
-    });
-    //button.addEventListener("click", buttonHandler);
+    chatInput.addEventListener("keydown", chatInputHandler);
+
+
+    joinBtn.addEventListener("click", joinBtnHandler);
 
     return;
 }
@@ -47,6 +146,7 @@ function addHandlers() {
 function setUpSocket() {
     socket = io();
     socket.on('chat', getMessage);
+    socket.on('joinGame', joinGame);
     return;
 }
 
