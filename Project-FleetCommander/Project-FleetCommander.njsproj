@@ -113,6 +113,9 @@
     <TypeScriptCompile Include="server\src\classes\Player.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="server\src\classes\Ships.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="shared\src\classes\Actions.ts" />
     <TypeScriptCompile Include="shared\src\classes\Dice.ts" />
     <TypeScriptCompile Include="shared\src\classes\Game.ts" />

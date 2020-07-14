@@ -16,5 +16,8 @@ export type game = {
     chatLog: string[],
     playerList: playerList,
     playerCount: number
-}
-export type playerList = { [player: string]: string }
+};
+export type playerList = { [player: string]: string };
+export type coordinate = [number, number];
+
+
