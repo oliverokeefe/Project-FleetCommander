@@ -5,6 +5,9 @@ export class Game {
 
     public name: string;
 
+    //Players
+    //Board
+
     constructor(name: string) {
         this.name = name;
     }
