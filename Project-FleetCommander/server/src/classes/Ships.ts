@@ -1,6 +1,6 @@
 
 import { coordinate } from '../../../shared/src/types/types'
-import { Grid, Tile } from './GameBoard';
+import { Board, Tile } from './GameBoard';
 
 
 export abstract class Ship {
@@ -25,7 +25,7 @@ export abstract class Ship {
     }
 
     public validMove(coordinate: coordinate): boolean {
-        return Grid.validCoordinate(coordinate) && this.shipCanReach(coordinate);
+        return Board.validCoordinate(coordinate) && this.shipCanReach(coordinate);
     }
 
     public shipCanReach(coordinate: coordinate): boolean {

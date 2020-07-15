@@ -110,6 +110,7 @@
     <TypeScriptCompile Include="server\src\classes\Game.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="server\src\classes\GameBoard.ts" />
     <TypeScriptCompile Include="server\src\classes\Player.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
