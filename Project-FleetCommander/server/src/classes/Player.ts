@@ -1,3 +1,5 @@
+import { Territory } from "./GameBoard";
+import { Ship } from "./Ships";
 
 
 
@@ -5,11 +7,15 @@ export class Player {
 
     public name: string;
     public score: number;
-    //ships
+    public territory: Territory;
+    public ships: Ship[];
 
 
     constructor(name: string) {
         this.name = name;
+        this.score = 0;
+        this.territory = undefined;
+        this.ships = [];
     }
 
 

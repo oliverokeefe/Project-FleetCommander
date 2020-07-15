@@ -21,12 +21,24 @@ export class Game {
         if (!this.players[player]) {
             this.players[player] = new Player(player);
             this.size++;
+            this.board.territories.forEach((territory) => {
+                if (!territory.player && !this.players[player].territory) {
+                    territory.player = this.players[player].name;
+                    this.players[player].territory = territory;
+                }
+            });
         }
         return;
     }
 
     public removePlayer(player: string): void {
         if (this.players[player]) {
+            this.board.territories.forEach((territory) => {
+                if (territory.player === this.players[player].name) {
+                    territory.player = "";
+                    this.players[player].territory = undefined;
+                }
+            });
             delete this.players[player];
             this.size--;
         }
