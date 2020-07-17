@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 class Player {
-    //ships
     constructor(name) {
         this.name = name;
+        this.score = 0;
+        this.territory = undefined;
+        this.ships = [];
     }
 }
 exports.Player = Player;

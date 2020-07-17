@@ -7,11 +7,21 @@ export class Tile {
     public value: number;
     public cluster: number;
 
+    public territory: string;
+    public ship: string
+    public isSpawn: boolean;
+    public canBuildOn: boolean;
+
 
     constructor(coordinate: coordinate, value?: number, cluster?: number) {
         this.coordinate = coordinate;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;
+
+        this.territory = "";
+        this.ship = "";
+        this.isSpawn = false;
+        this.canBuildOn = false;
     }
 
 }
@@ -70,6 +80,7 @@ export class Board {
             for (let col = 0; col < Board.size; col++) {
                 this.board[row].push(new Tile([row, col]));
 
+                //Set point tiles and clusters
                 if (((0 <= row && row <= 2) && col === 5) ||
                     (row === 1 && (4 <= col && col <= 6))) {
                     this.board[row][col].value = 1;
@@ -95,6 +106,104 @@ export class Board {
                     this.board[row][col].cluster = 5;
                 }
 
+                //Set spawns, territories, and build tiles
+
+                //Pawns
+                if ((row === 2 && (0 <= col && col <= 2)) ||
+                    ((0 <= row && row <= 2) && col === 2)) {
+                    this.board[row][col].territory = "topLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "pawn";
+                } else if ((row === 2 && (8 <= col && col <= 10)) ||
+                    ((0 <= row && row <= 2) && col === 8)) {
+                    this.board[row][col].territory = "topRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "pawn";
+                } else if ((row === 8 && (8 <= col && col <= 10)) ||
+                    ((8 <= row && row <= 10) && col === 8)) {
+                    this.board[row][col].territory = "botRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "pawn";
+                } else if ((row === 8 && (0 <= col && col <= 2)) ||
+                    ((8 <= row && row <= 10) && col === 2)) {
+                    this.board[row][col].territory = "botLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "pawn";
+                }
+
+                //Knights
+                if ((row === 0 && col === 1) || (row === 1 && col === 0)) {
+                    this.board[row][col].territory = "topLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "knight";
+                } else if ((row === 0 && col === 9) || (row === 1 && col === 10)) {
+                    this.board[row][col].territory = "topRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "knight";
+                } else if ((row === 10 && col === 9) || (row === 9 && col === 10)) {
+                    this.board[row][col].territory = "botRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "knight";
+                } else if ((row === 9 && col === 0) || (row === 10 && col === 1)) {
+                    this.board[row][col].territory = "botLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "knight";
+                }
+
+                //Command
+                if (row === 1 && col === 1) {
+                    this.board[row][col].territory = "topLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "command";
+                } else if (row === 1 && col === 9) {
+                    this.board[row][col].territory = "topRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "command";
+                } else if (row === 9 && col === 9) {
+                    this.board[row][col].territory = "botRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "command";
+                } else if (row === 9 && col === 1) {
+                    this.board[row][col].territory = "botLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "command";
+                }
+
+                //Flagship
+                if (row === 0 && col === 0) {
+                    this.board[row][col].territory = "topLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "flagship";
+                } else if (row === 0 && col === 10) {
+                    this.board[row][col].territory = "topRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "flagship";
+                } else if (row === 10 && col === 10) {
+                    this.board[row][col].territory = "botRight";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "flagship";
+                } else if (row === 10 && col === 0) {
+                    this.board[row][col].territory = "botLeft";
+                    this.board[row][col].canBuildOn = true;
+                    this.board[row][col].isSpawn = true;
+                    this.board[row][col].ship = "flagship";
+                }
+
             }
 
         }
@@ -102,6 +211,8 @@ export class Board {
     }
 
     private createTerritories(): void {
+
+        this.territories = [];
 
         //Top Left
         let topLeft: Territory = new Territory();
@@ -152,10 +263,12 @@ export class Board {
 
     public toString(): string {
 
-        let boardAsString = " T | ";
+        let letters = ['A','B','C','D','E','F','G','H','I','J','K']
+
+        let boardAsString = "  | ";
 
         for (let colIndex = 0; colIndex < this.board.length; colIndex++) {
-            boardAsString += `${colIndex} | `;
+            boardAsString += (colIndex < 10) ? `${colIndex} | ` : `${colIndex}| `;
         }
 
         boardAsString += "\n----";
@@ -166,10 +279,35 @@ export class Board {
         boardAsString += "\n";
 
         this.board.forEach((row, rowIndex) => {
-            boardAsString += (rowIndex < 10) ? ` ${rowIndex} | ` : `${rowIndex} | `;
+            //boardAsString += (rowIndex < 10) ? ` ${rowIndex} | ` : `${rowIndex} | `;
+            boardAsString += `${letters[rowIndex]} | `;
+
             row.forEach((tile) => {
-                boardAsString += (tile.value === 0) ? "  | " : `${tile.value} | `;
+                if (tile.isSpawn) {
+                    switch (tile.ship) {
+                        case ("pawn"):
+                            boardAsString += ". | ";
+                            break;
+                        case ("knight"):
+                            boardAsString += "* | ";
+                            break;
+                        case ("command"):
+                            boardAsString += "+ | ";
+                            break;
+                        case ("flagship"):
+                            boardAsString += "# | ";
+                            break;
+                        default:
+                            boardAsString += "  | ";
+                            break;
+                    }
+                } else if (tile.value > 0) {
+                    boardAsString += `${tile.value} | `;
+                } else {
+                    boardAsString += "  | ";
+                }
             });
+
             boardAsString += "\n----"
             for (let i = 0; i < this.board.length; i++) {
                 boardAsString += `----`;
