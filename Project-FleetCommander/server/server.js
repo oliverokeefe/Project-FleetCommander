@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
 const express = require("express");
 const path = require("path");
+const GameBoard_1 = require("./src/classes/GameBoard");
 const app = express();
 let http = require('http').createServer(app);
 let io = require('socket.io')(http);
@@ -17,6 +18,8 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 let GameList = {};
+let GameBoard = new GameBoard_1.Board();
+console.log(GameBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 ///Helpful functions for creating/joining or leaving/deleting a game.
 ///as well as creating/updating or removing a character.

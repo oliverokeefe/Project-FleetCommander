@@ -1,62 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wait = exports.Rest = exports.Search = exports.Move = exports.Hide = exports.Attack = exports.Action = void 0;
-class Action {
-    constructor(owner) {
-        this.actionType = "";
-        this.owner = owner;
-        this.interupted = false;
-    }
-    static comparator(a, b) {
-        return a._priority < b._priority;
-    }
-    static isValidAction(action) {
-        return Action.PLAYERACTIONS.hasOwnProperty(action);
-    }
-    static buildAction(owner) {
-        let action = undefined;
-        if (Action.isValidAction(owner.actionKey)) {
-            switch (owner.actionKey) {
-                case (Action.PLAYERACTIONS.attack):
-                    action = new Attack(owner);
-                    break;
-                case (Action.PLAYERACTIONS.hide):
-                    action = new Hide(owner);
-                    break;
-                case (Action.PLAYERACTIONS.move):
-                    action = new Move(owner);
-                    break;
-                case (Action.PLAYERACTIONS.search):
-                    action = new Search(owner);
-                    break;
-                case (Action.PLAYERACTIONS.rest):
-                    action = new Rest(owner);
-                    break;
-                case (Action.PLAYERACTIONS.wait):
-                    action = new Wait(owner);
-                    break;
-                default:
-                    break;
-            }
+let Action = /** @class */ (() => {
+    class Action {
+        constructor(owner) {
+            this.actionType = "";
+            this.owner = owner;
+            this.interupted = false;
         }
-        return action;
+        static comparator(a, b) {
+            return a._priority < b._priority;
+        }
+        static isValidAction(action) {
+            return Action.PLAYERACTIONS.hasOwnProperty(action);
+        }
+        static buildAction(owner) {
+            let action = undefined;
+            if (Action.isValidAction(owner.actionKey)) {
+                switch (owner.actionKey) {
+                    case (Action.PLAYERACTIONS.attack):
+                        action = new Attack(owner);
+                        break;
+                    case (Action.PLAYERACTIONS.hide):
+                        action = new Hide(owner);
+                        break;
+                    case (Action.PLAYERACTIONS.move):
+                        action = new Move(owner);
+                        break;
+                    case (Action.PLAYERACTIONS.search):
+                        action = new Search(owner);
+                        break;
+                    case (Action.PLAYERACTIONS.rest):
+                        action = new Rest(owner);
+                        break;
+                    case (Action.PLAYERACTIONS.wait):
+                        action = new Wait(owner);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return action;
+        }
+        resolve() {
+            return `+${this.owner.getNameTag()}:: ${this.actionType} <br/>`;
+        }
+        attackResponse() {
+            return "";
+        }
     }
-    resolve() {
-        return `+${this.owner.getNameTag()}:: ${this.actionType} <br/>`;
-    }
-    attackResponse() {
-        return "";
-    }
-}
+    Action.PLAYERACTIONS = {
+        attack: "attack",
+        hide: "hide",
+        move: "move",
+        search: "search",
+        rest: "rest",
+        wait: "wait"
+    };
+    return Action;
+})();
 exports.Action = Action;
-Action.PLAYERACTIONS = {
-    attack: "attack",
-    hide: "hide",
-    move: "move",
-    search: "search",
-    rest: "rest",
-    wait: "wait"
-};
 class Attack extends Action {
     constructor(owner) {
         super(owner);

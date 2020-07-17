@@ -5,6 +5,7 @@ import path = require('path');
 import { joinData, gameList } from '../shared/src/types/types';
 import { Player } from '../shared/src/classes/Player';
 import { Server } from 'socket.io';
+import { Board } from './src/classes/GameBoard';
 
 const app = express();
 let http = require('http').createServer(app);
@@ -24,6 +25,8 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 let GameList: gameList = {};
+let GameBoard: Board = new Board();
+console.log(GameBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ///Helpful functions for creating/joining or leaving/deleting a game.
