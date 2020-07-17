@@ -2,59 +2,62 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 const Actions_js_1 = require("./Actions.js");
-class Player {
-    constructor(playerId, playerName, stats) {
-        this.playerId = playerId;
-        this.playerName = playerName;
-        this.stats = stats;
-        this.vitals = Player.STARTINGVITALS;
-        return;
-    }
-    takeDmg(damage) {
-        this.vitals.hp = (this.vitals.hp - damage <= 0) ? 0 : this.vitals.hp - damage;
-    }
-    getNameTag() {
-        return "[" + this.playerId + "] " + this.playerName;
-    }
-    setAction() {
-        if (Actions_js_1.Action.isValidAction(this.actionKey)) {
-            this.action = Actions_js_1.Action.buildAction(this);
+let Player = /** @class */ (() => {
+    class Player {
+        constructor(playerId, playerName, stats) {
+            this.playerId = playerId;
+            this.playerName = playerName;
+            this.stats = stats;
+            this.vitals = Player.STARTINGVITALS;
+            return;
         }
-        else {
-            this.action = undefined;
+        takeDmg(damage) {
+            this.vitals.hp = (this.vitals.hp - damage <= 0) ? 0 : this.vitals.hp - damage;
         }
-        return this.action;
+        getNameTag() {
+            return "[" + this.playerId + "] " + this.playerName;
+        }
+        setAction() {
+            if (Actions_js_1.Action.isValidAction(this.actionKey)) {
+                this.action = Actions_js_1.Action.buildAction(this);
+            }
+            else {
+                this.action = undefined;
+            }
+            return this.action;
+        }
+        setTarget(target) {
+            this.target = target;
+        }
+        updateAction(action, targetId, modifier) {
+            this.actionKey = action;
+            this.targetId = targetId;
+            this.modifier = modifier;
+        }
+        /**
+         * This is for testing, needs to be removed/changed for production
+         */
+        updatePlayer(name, vitals, stats) {
+            this.playerName = name;
+            this.vitals = vitals;
+            this.stats = stats;
+        }
     }
-    setTarget(target) {
-        this.target = target;
-    }
-    updateAction(action, targetId, modifier) {
-        this.actionKey = action;
-        this.targetId = targetId;
-        this.modifier = modifier;
-    }
-    /**
-     * This is for testing, needs to be removed/changed for production
-     */
-    updatePlayer(name, vitals, stats) {
-        this.playerName = name;
-        this.vitals = vitals;
-        this.stats = stats;
-    }
-}
+    Player.STARTINGVITALS = {
+        hp: 100,
+        san: 70,
+        sta: 50
+    };
+    Player.DEFAULTSTATS = {
+        str: 13,
+        dex: 13,
+        con: 12,
+        int: 12,
+        wis: 11,
+        cha: 11
+    };
+    Player.DEFAULTMODIFIER = 0;
+    return Player;
+})();
 exports.Player = Player;
-Player.STARTINGVITALS = {
-    hp: 100,
-    san: 70,
-    sta: 50
-};
-Player.DEFAULTSTATS = {
-    str: 13,
-    dex: 13,
-    con: 12,
-    int: 12,
-    wis: 11,
-    cha: 11
-};
-Player.DEFAULTMODIFIER = 0;
 //# sourceMappingURL=Player.js.map

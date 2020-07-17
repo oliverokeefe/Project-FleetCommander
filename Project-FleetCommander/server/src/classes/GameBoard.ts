@@ -105,6 +105,37 @@ export class Board {
         }
     }
 
+
+    public toString(): string {
+
+        let boardAsString = " T | ";
+
+        for (let colIndex = 0; colIndex < this.board.length; colIndex++) {
+            boardAsString += `${colIndex} | `;
+        }
+
+        boardAsString += "\n----";
+
+        for (let i = 0; i < this.board.length; i++) {
+            boardAsString += `----`;
+        }
+        boardAsString += "\n";
+
+        this.board.forEach((row, rowIndex) => {
+            boardAsString += (rowIndex < 10) ? ` ${rowIndex} | ` : `${rowIndex} | `;
+            row.forEach((tile) => {
+                boardAsString += (tile.value === 0) ? "  | " : `${tile.value} | `;
+            });
+            boardAsString += "\n----"
+            for (let i = 0; i < this.board.length; i++) {
+                boardAsString += `----`;
+            }
+            boardAsString += "\n";
+        });
+
+        return boardAsString;
+    }
+
 }
 
 
