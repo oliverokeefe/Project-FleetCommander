@@ -90,9 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="client\src\classes\devPlayerControl.ts" />
-    <TypeScriptCompile Include="client\src\classes\GameModel.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="client\src\classes\PlayerModel.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -110,7 +107,7 @@
     <TypeScriptCompile Include="server\src\classes\Game.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="server\src\classes\GameBoard.ts" />
+    <TypeScriptCompile Include="shared\src\classes\GameBoard.ts" />
     <TypeScriptCompile Include="server\src\classes\Player.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameList = exports.Game = void 0;
 const Player_1 = require("./Player");
-const GameBoard_1 = require("./GameBoard");
+const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
 class Game {
     constructor(name) {
         this.name = name;

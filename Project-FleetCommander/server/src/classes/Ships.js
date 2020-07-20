@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = void 0;
-const GameBoard_1 = require("./GameBoard");
+const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
 class Ship {
     constructor(id) {
         this.id = id;

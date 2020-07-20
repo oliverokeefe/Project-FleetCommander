@@ -1,10 +1,14 @@
 
-import type { joinData, game } from '../../../shared/src/types/types';
+import type { joinData, game, board } from '../../../shared/src/types/types';
+import { Tile } from '../../../shared/src/classes/GameBoard';
 
 let socket: SocketIOClient.Socket = undefined;
 
 let Game: string = "";
 let Player: string = "";
+
+let gameBoardDiv: HTMLDivElement = undefined;
+let gameBoard: board = [];
 
 
 let gameNameDisplay: HTMLDivElement = undefined;
@@ -71,11 +75,12 @@ function getMessage(message: string): void {
     return;
 }
 
-function joinGame(game: game, player: string): void {
+function joinGame(game: game, player: string, board: board): void {
     clearGame();
     updateChat(game.chatLog);
-    updateGameInfo(game)
-    updatePlayerInfo(player)
+    updateGameInfo(game);
+    updatePlayerInfo(player);
+    updateBoard(board);
     return;
 }
 
@@ -114,6 +119,20 @@ function joinBtnHandler(): void {
     return;
 }
 
+function updateBoard(board: board): void {
+    gameBoard = board;
+
+    //loop through gameBoard and reander each tile
+        //Render:
+        //Hide game board element
+        //-Create Div for the tile
+        //-create any HTML elements necessary for pieces on the tile and add them as children
+        //-add the tile element to the board element
+        //Unhide game board element
+
+    return;
+}
+
 
 
 
@@ -129,6 +148,8 @@ function populateDOMElementVariables() {
     gameInput = document.getElementById("GameInput") as HTMLInputElement;
     playerInput = document.getElementById("PlayerInput") as HTMLInputElement;
     joinBtn = document.getElementById("JoinBtn") as HTMLButtonElement;
+
+    gameBoardDiv = document.getElementById("GameBoard") as HTMLDivElement;
 
     return;
 }

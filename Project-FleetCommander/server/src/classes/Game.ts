@@ -1,5 +1,5 @@
 import { Player } from "./Player";
-import { Board } from "./GameBoard";
+import { Board } from "../../../shared/src/classes/GameBoard";
 
 
 

@@ -1,13 +1,16 @@
-import { coordinate } from "../../../shared/src/types/types";
+import { coordinate, board } from "../../../shared/src/types/types";
 
 
 export class Tile {
+
+    public displayDiv: HTMLDivElement;
 
     public coordinate: coordinate;
     public value: number;
     public cluster: number;
 
     public territory: string;
+    public ships: [];
     public ship: string
     public isSpawn: boolean;
     public canBuildOn: boolean;
@@ -22,6 +25,8 @@ export class Tile {
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
+
+
     }
 
 }
@@ -55,7 +60,7 @@ export class Board {
 
     static readonly size: number = 11;
 
-    public board: Array<Array<Tile>>;
+    public board: board;
 
     public territories: Territory[];
 
@@ -319,13 +324,5 @@ export class Board {
     }
 
 }
-
-
-
-
-
-
-
-
 
 

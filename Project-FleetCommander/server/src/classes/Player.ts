@@ -1,4 +1,4 @@
-import { Territory } from "./GameBoard";
+import { Territory } from "../../../shared/src/classes/GameBoard";
 import { Ship } from "./Ships";
 
 

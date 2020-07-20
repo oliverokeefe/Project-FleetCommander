@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
 const express = require("express");
 const path = require("path");
-const GameBoard_1 = require("./src/classes/GameBoard");
+const GameBoard_1 = require("../shared/src/classes/GameBoard");
 const app = express();
 let http = require('http').createServer(app);
 let io = require('socket.io')(http);

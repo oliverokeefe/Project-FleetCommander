@@ -1,6 +1,8 @@
 let socket = undefined;
 let Game = "";
 let Player = "";
+let gameBoardDiv = undefined;
+let gameBoard = [];
 let gameNameDisplay = undefined;
 let playerNameDisplay = undefined;
 let gameInput = undefined;
@@ -48,11 +50,12 @@ function getMessage(message) {
     chatLogDisplay.scrollTop = chatLogDisplay.scrollHeight;
     return;
 }
-function joinGame(game, player) {
+function joinGame(game, player, board) {
     clearGame();
     updateChat(game.chatLog);
     updateGameInfo(game);
     updatePlayerInfo(player);
+    updateBoard(board);
     return;
 }
 function sendMessage(message) {
@@ -82,6 +85,17 @@ function joinBtnHandler() {
     //else error
     return;
 }
+function updateBoard(board) {
+    gameBoard = board;
+    //loop through gameBoard and reander each tile
+    //Render:
+    //Hide game board element
+    //-Create Div for the tile
+    //-create any HTML elements necessary for pieces on the tile and add them as children
+    //-add the tile element to the board element
+    //Unhide game board element
+    return;
+}
 function populateDOMElementVariables() {
     gameNameDisplay = document.getElementById("GameName");
     playerNameDisplay = document.getElementById("PlayerName");
@@ -90,6 +104,7 @@ function populateDOMElementVariables() {
     gameInput = document.getElementById("GameInput");
     playerInput = document.getElementById("PlayerInput");
     joinBtn = document.getElementById("JoinBtn");
+    gameBoardDiv = document.getElementById("GameBoard");
     return;
 }
 function addHandlers() {

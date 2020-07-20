@@ -5,7 +5,7 @@ import path = require('path');
 import { joinData, gameList } from '../shared/src/types/types';
 import { Player } from '../shared/src/classes/Player';
 import { Server } from 'socket.io';
-import { Board } from './src/classes/GameBoard';
+import { Board } from '../shared/src/classes/GameBoard';
 
 const app = express();
 let http = require('http').createServer(app);
