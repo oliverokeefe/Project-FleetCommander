@@ -24,7 +24,7 @@
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            color: #e6e6e6;
+            /*color: #e6e6e6;*/
             background-color: #262626;
             padding-left: 5px;
         }
@@ -124,18 +124,169 @@
         }
         /*Territory borders END*/
 
-        .ship {
-            width: 10px;
-            height: 10px;
+        div.playerOnePiece {
             background-color: red;
+        }
+        div.playerTwoPiece {
+            background-color: yellow;
+        }
+        div.playerThreePiece {
+            background-color: green;
+        }
+        div.playerFourPiece {
+            background-color: blue;
+        }
+
+        .ship {
+            width: 15px;
+            height: 15px;
+            background-color: black;
+            text-align: center;            
+        }
+
+        div.pawn {
+            width: 15px;
+            height: 15px;
+        }
+        div.knight {
+            width: 20px;
+            height: 20px;
+        }
+        div.command {
+            width: 25px;
+            height: 25px;
+        }
+        div.flagship {
+            width: 30px;
+            height: 30px;
         }
 
     </style>
 
     <script>
 
+        let gameBoard = [];
 
+        function populateDOMElementVariables() {
 
+            let rows = document.getElementsByClassName("row");
+
+            for (let i = 0; i < rows.length; i++) {
+                gameBoard.push(rows[i].getElementsByClassName("cell"));
+            }
+
+            return;
+        }
+
+        function addHandlers() {
+
+            return;
+        }
+
+        function spawnShips() {
+
+            //Player One
+            spawPawns("playerOnePiece", 0, 2, 0, 2);
+            spawnKnights("playerOnePiece", [0,1], [1,0]);
+            spawnShip("playerOnePiece", "command", [1,1]);
+            spawnShip("playerOnePiece", "flagship", [0,0]);
+
+            //Player Two
+            spawPawns("playerTwoPiece", 0, 2, 8, 10);
+            spawnKnights("playerTwoPiece", [0,9], [1,10]);
+            spawnShip("playerTwoPiece", "command", [1,9]);
+            spawnShip("playerTwoPiece", "flagship", [0,10]);
+
+            //Player Three
+            spawPawns("playerThreePiece", 8, 10, 8, 10);
+            spawnKnights("playerThreePiece", [9,10], [10,9]);
+            spawnShip("playerThreePiece", "command", [9,9]);
+            spawnShip("playerThreePiece", "flagship", [10,10]);
+
+            //Player Four
+            spawPawns("playerFourPiece", 8, 10, 0, 2);
+            spawnKnights("playerFourPiece", [9,0], [10,1]);
+            spawnShip("playerFourPiece", "command", [9,1]);
+            spawnShip("playerFourPiece", "flagship", [10,0]);
+
+            return;
+        }
+
+        function spawPawns(playerPieceClass, rowMin, rowMax, colMin, colMax) {
+
+            switch (playerPieceClass) {
+                case ("playerOnePiece"):
+                    for (let row = rowMin; row <= rowMax; row++) {
+                        spawnShip(playerPieceClass, "pawn", [row,colMax]);
+                    }
+                    for (let col = colMin; col < colMax; col++) {
+                        spawnShip(playerPieceClass, "pawn", [rowMax,col]);
+                    }
+                    break;
+                case ("playerTwoPiece"):
+                    for (let row = rowMin; row <= rowMax; row++) {
+                        spawnShip(playerPieceClass, "pawn", [row,colMin]);
+                    }
+                    for (let col = colMax; col > colMin; col--) {
+                        spawnShip(playerPieceClass, "pawn", [rowMax,col]);
+                    }
+                    break;
+                case ("playerThreePiece"):
+                    for (let row = rowMin; row <= rowMax; row++) {
+                        spawnShip(playerPieceClass, "pawn", [row,colMin]);
+                    }
+                    for (let col = colMax; col > colMin; col--) {
+                        spawnShip(playerPieceClass, "pawn", [rowMin,col]);
+                    }
+                    break;
+                case ("playerFourPiece"):
+                    for (let row = rowMin; row <= rowMax; row++) {
+                        spawnShip(playerPieceClass, "pawn", [row,colMax]);
+                    }
+                    for (let col = colMin; col < colMax; col++) {
+                        spawnShip(playerPieceClass, "pawn", [rowMin,col]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return;
+        }
+
+        function spawnKnights(playerPieceClass, coordinateOne, coordinateTwo) {
+
+            spawnShip(playerPieceClass, "knight", coordinateOne);
+            spawnShip(playerPieceClass, "knight", coordinateTwo);
+
+            return;
+        }
+
+        function spawnShip(playerPieceClass, shipClass, coordinate) {
+            let ship = document.createElement("div");
+            ship.classList.add("ship", shipClass, playerPieceClass);
+            ship.innerText = shipClass.charAt(0).toUpperCase();
+            gameBoard[coordinate[0]][coordinate[1]].appendChild(ship);
+
+            return;
+        }
+
+        function init() {
+
+            populateDOMElementVariables();
+            addHandlers();
+
+            spawnShips();
+
+            console.log("initialized");
+            return;
+        }
+
+        window.onload = function () {
+            init();
+
+            return;
+        };
 
 
     </script>
@@ -145,7 +296,7 @@
 
     <div class="board">
         <div class="row r0 even">
-            <div class="cell c0 even"><div class="ship"></div></div>        <div class="cell c1 odd"></div>        <div class="cell c2 even"></div>        <div class="cell c3 odd"></div>        <div class="cell c4 even"></div>        <div class="cell c5 odd"></div>        <div class="cell c6 even"></div>        <div class="cell c7 odd"></div>        <div class="cell c8 even"></div>        <div class="cell c9 odd"></div>        <div class="cell c10 even"></div>
+            <div class="cell c0 even"></div>        <div class="cell c1 odd"></div>        <div class="cell c2 even"></div>        <div class="cell c3 odd"></div>        <div class="cell c4 even"></div>        <div class="cell c5 odd"></div>        <div class="cell c6 even"></div>        <div class="cell c7 odd"></div>        <div class="cell c8 even"></div>        <div class="cell c9 odd"></div>        <div class="cell c10 even"></div>
         </div>
         <div class="row r1 odd">
             <div class="cell c0 even"></div>        <div class="cell c1 odd"></div>        <div class="cell c2 even"></div>        <div class="cell c3 odd"></div>        <div class="cell c4 even"></div>        <div class="cell c5 odd"></div>        <div class="cell c6 even"></div>        <div class="cell c7 odd"></div>        <div class="cell c8 even"></div>        <div class="cell c9 odd"></div>        <div class="cell c10 even"></div>
