@@ -1,83 +1,150 @@
 
-//Make sure the page has a socket.io script this tag before this
-//<script src="/socket.io/socket.io.js" > </script>
-
-import { testPlayer } from '../../../shared/src/classes/testPlayer.js';
-import { testAction } from '../../../shared/src/classes/testAction.js';
-import { PriorityQueue } from '../classes/PriorityQueue.js';
-
-let socket: SocketIOClient.Socket = undefined;
-
-let players: testPlayer[] = [];
-
-let enterBtn: HTMLButtonElement;
-let output: HTMLDivElement;
+import { coordinate, board } from "../../../shared/src/types/types";
+import { Tile } from "../../../shared/src/classes/GameBoard";
 
 
-function outputMsg(msg: string) {
+let gameBoardDiv: HTMLDivElement = undefined;
+let gameBoard = [];
 
-    output.innerHTML = msg;
-}
 
-function testHandler() {
+function populateGameBoard() {
 
-}
-
-function enterBtnClickHandler() {
-
-    let actionList: PriorityQueue = new PriorityQueue(testAction.comparator);
-
-    console.log(JSON.parse(JSON.stringify(actionList)))
-    players.forEach(function (player, index) {
-        actionList.push(player.getSelectedAction());
-    });
-    console.log(JSON.parse(JSON.stringify(actionList)))
-
-    let actionLog: string = "";
-    while (!actionList.isEmpty()) {
-
-        let curAction: testAction = actionList.pop();
-        console.log(curAction);
-        actionLog += curAction.owner + ": " + curAction.action + "<br/>";
+    for (let row = 0; row < 11; row++) {
+        gameBoardDiv.appendChild(createRow(row));
     }
 
-
-    socket.emit('EnterBtnClicked', actionLog);
-}
-
-function createPlayers() {
-
-    players.push(new testPlayer(document.getElementById("Player1") as HTMLDivElement, "Player1"));
-    players.push(new testPlayer(document.getElementById("Player2") as HTMLDivElement, "Player2"));
-    players.push(new testPlayer(document.getElementById("Player3") as HTMLDivElement, "Player3"));
-    players.push(new testPlayer(document.getElementById("Player4") as HTMLDivElement, "Player4"));
-    players.push(new testPlayer(document.getElementById("Player5") as HTMLDivElement, "Player5"));
-    players.push(new testPlayer(document.getElementById("Player6") as HTMLDivElement, "Player6"));
+    gameBoardDiv.classList.remove("nodisp");
 
     return;
 }
 
-function setUpEnterBtn() {
+function createRow(row: number): HTMLDivElement {
 
-    enterBtn = document.getElementById("EnterBtn") as HTMLButtonElement;
-    output = document.getElementById("Output") as HTMLDivElement;
+    let rowDiv: HTMLDivElement = document.createElement("div") as HTMLDivElement;
+    let oddeven = (row % 2 === 0) ? "even" : "odd";
+    rowDiv.classList.add("row", `r${row}`, oddeven);
 
-    enterBtn.addEventListener("click", enterBtnClickHandler);
+    for (let col = 0; col < 11; col++) {
+        rowDiv.appendChild(createTile([row,col]));
+    }
+
+    return rowDiv;
+}
+
+function createTile(coordinate: coordinate): HTMLDivElement {
+
+    let tile: HTMLDivElement = document.createElement("div") as HTMLDivElement;
+    let oddeven = (coordinate[1] % 2 === 0) ? "even" : "odd";
+    tile.classList.add("tile", `c${coordinate[1]}`, oddeven);
+    tile.id = `${coordinate[0]}${coordinate[1]}`;
+
+    return tile;
+}
+
+
+function populateDOMElementVariables() {
+
+    gameBoardDiv = document.getElementById("GameBoard") as HTMLDivElement;
 
     return;
 }
 
-function setUpSocket() {
-    socket = io();
-    socket.on('Output', outputMsg);
+function spawnShips() {
 
+    //Player One
+    spawPawns("playerOnePiece", 0, 2, 0, 2);
+    spawnKnights("playerOnePiece", [0, 1], [1, 0]);
+    spawnShip("playerOnePiece", "command", [1, 1]);
+    spawnShip("playerOnePiece", "flagship", [0, 0]);
+
+    //Player Two
+    spawPawns("playerTwoPiece", 0, 2, 8, 10);
+    spawnKnights("playerTwoPiece", [0, 9], [1, 10]);
+    spawnShip("playerTwoPiece", "command", [1, 9]);
+    spawnShip("playerTwoPiece", "flagship", [0, 10]);
+
+    //Player Three
+    spawPawns("playerThreePiece", 8, 10, 8, 10);
+    spawnKnights("playerThreePiece", [9, 10], [10, 9]);
+    spawnShip("playerThreePiece", "command", [9, 9]);
+    spawnShip("playerThreePiece", "flagship", [10, 10]);
+
+    //Player Four
+    spawPawns("playerFourPiece", 8, 10, 0, 2);
+    spawnKnights("playerFourPiece", [9, 0], [10, 1]);
+    spawnShip("playerFourPiece", "command", [9, 1]);
+    spawnShip("playerFourPiece", "flagship", [10, 0]);
+
+    return;
+}
+
+function spawPawns(playerPieceClass, rowMin, rowMax, colMin, colMax) {
+
+    switch (playerPieceClass) {
+        case ("playerOnePiece"):
+            for (let row = rowMin; row <= rowMax; row++) {
+                spawnShip(playerPieceClass, "pawn", [row, colMax]);
+            }
+            for (let col = colMin; col < colMax; col++) {
+                spawnShip(playerPieceClass, "pawn", [rowMax, col]);
+            }
+            break;
+        case ("playerTwoPiece"):
+            for (let row = rowMin; row <= rowMax; row++) {
+                spawnShip(playerPieceClass, "pawn", [row, colMin]);
+            }
+            for (let col = colMax; col > colMin; col--) {
+                spawnShip(playerPieceClass, "pawn", [rowMax, col]);
+            }
+            break;
+        case ("playerThreePiece"):
+            for (let row = rowMin; row <= rowMax; row++) {
+                spawnShip(playerPieceClass, "pawn", [row, colMin]);
+            }
+            for (let col = colMax; col > colMin; col--) {
+                spawnShip(playerPieceClass, "pawn", [rowMin, col]);
+            }
+            break;
+        case ("playerFourPiece"):
+            for (let row = rowMin; row <= rowMax; row++) {
+                spawnShip(playerPieceClass, "pawn", [row, colMax]);
+            }
+            for (let col = colMin; col < colMax; col++) {
+                spawnShip(playerPieceClass, "pawn", [rowMin, col]);
+            }
+            break;
+        default:
+            break;
+    }
+
+    return;
+}
+
+function spawnKnights(playerPieceClass, coordinateOne, coordinateTwo) {
+
+    spawnShip(playerPieceClass, "knight", coordinateOne);
+    spawnShip(playerPieceClass, "knight", coordinateTwo);
+
+    return;
+}
+
+function spawnShip(playerPieceClass, shipClass, coordinate) {
+    let ship = document.createElement("div");
+    ship.classList.add("ship", shipClass, playerPieceClass);
+    ship.innerText = shipClass.charAt(0).toUpperCase();
+    document.getElementById(`${coordinate[0]}${coordinate[1]}`).appendChild(ship);
+
+    return;
 }
 
 function init() {
-    createPlayers();
-    setUpEnterBtn();
-    setUpSocket();
 
+
+    populateDOMElementVariables();
+    populateGameBoard();
+    spawnShips();
+
+    console.log("initialized");
     return;
 }
 
@@ -86,5 +153,4 @@ window.onload = function () {
 
     return;
 };
-
 
