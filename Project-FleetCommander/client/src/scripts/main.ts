@@ -59,8 +59,8 @@ function updateChat(chatLog: string[]): void {
     return;
 }
 
-function updateGameInfo(game: game): void {
-    gameNameDisplay.innerText = game.name;
+function updateGameInfo(game: string): void {
+    gameNameDisplay.innerText = game;
 }
 
 function updatePlayerInfo(player: string): void {
@@ -75,12 +75,12 @@ function getMessage(message: string): void {
     return;
 }
 
-function joinGame(game: game, player: string, board: board): void {
+function joinGame(game: string, player: string, chatlog: string[]): void {
     clearGame();
-    updateChat(game.chatLog);
+    updateChat(chatlog);
     updateGameInfo(game);
     updatePlayerInfo(player);
-    updateBoard(board);
+    //updateBoard(board);
     return;
 }
 

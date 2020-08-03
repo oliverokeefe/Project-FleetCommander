@@ -15,6 +15,7 @@ export class Game {
         this.name = name;
         this.playerCount = 0;
         this.players = {};
+        this.chatLog = [];
         this.board = new Board();
     }
 

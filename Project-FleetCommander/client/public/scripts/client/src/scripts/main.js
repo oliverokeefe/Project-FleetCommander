@@ -40,7 +40,7 @@ function updateChat(chatLog) {
     return;
 }
 function updateGameInfo(game) {
-    gameNameDisplay.innerText = game.name;
+    gameNameDisplay.innerText = game;
 }
 function updatePlayerInfo(player) {
     playerNameDisplay.innerText = player;
@@ -50,12 +50,12 @@ function getMessage(message) {
     chatLogDisplay.scrollTop = chatLogDisplay.scrollHeight;
     return;
 }
-function joinGame(game, player, board) {
+function joinGame(game, player, chatlog) {
     clearGame();
-    updateChat(game.chatLog);
+    updateChat(chatlog);
     updateGameInfo(game);
     updatePlayerInfo(player);
-    updateBoard(board);
+    //updateBoard(board);
     return;
 }
 function sendMessage(message) {
