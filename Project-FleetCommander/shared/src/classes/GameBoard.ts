@@ -3,7 +3,7 @@ import { coordinate, board } from "../../../shared/src/types/types";
 
 export class Tile {
 
-    public displayDiv: HTMLDivElement;
+    //public displayDiv: HTMLDivElement;
 
     public coordinate: coordinate;
     public value: number;
@@ -17,6 +17,9 @@ export class Tile {
 
 
     constructor(coordinate: coordinate, value?: number, cluster?: number) {
+
+        //this.displayDiv = undefined;
+
         this.coordinate = coordinate;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Board = exports.Territory = exports.Tile = void 0;
 class Tile {
     constructor(coordinate, value, cluster) {
+        //this.displayDiv = undefined;
         this.coordinate = coordinate;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;

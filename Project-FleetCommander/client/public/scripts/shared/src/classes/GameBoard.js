@@ -1,5 +1,6 @@
 export class Tile {
     constructor(coordinate, value, cluster) {
+        //this.displayDiv = undefined;
         this.coordinate = coordinate;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;

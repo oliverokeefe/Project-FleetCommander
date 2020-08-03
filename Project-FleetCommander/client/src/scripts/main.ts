@@ -1,6 +1,6 @@
 
 import type { joinData, game, board, coordinate } from '../../../shared/src/types/types';
-import { Tile } from '../../../shared/src/classes/GameBoard';
+import { Board, Territory, Tile } from '../../../shared/src/classes/GameBoard.js';
 
 let socket: SocketIOClient.Socket = undefined;
 
@@ -8,6 +8,7 @@ let Game: string = "";
 let Player: string = "";
 
 let gameBoardDiv: HTMLDivElement = undefined;
+let gameBoardDisplay: HTMLDivElement[][] = [];
 let gameBoard: board = [];
 
 
@@ -75,12 +76,12 @@ function getMessage(message: string): void {
     return;
 }
 
-function joinGame(game: string, player: string, chatlog: string[]): void {
+function joinGame(game: string, player: string, chatlog: string[], board: board): void {
     clearGame();
     updateChat(chatlog);
     updateGameInfo(game);
     updatePlayerInfo(player);
-    //updateBoard(board);
+    updateBoard(board);
     return;
 }
 
@@ -120,9 +121,19 @@ function joinBtnHandler(): void {
 }
 
 function updateBoard(board: board): void {
+
     gameBoard = board;
 
+    gameBoard.forEach((row: Tile[]) => {
+        row.forEach((tile: Tile) => {
+
+        });
+    });
+
     //loop through gameBoard and reander each tile
+        //Add ships or remove ships as necessary
+
+
         //Render:
         //Hide game board element
         //-Create Div for the tile
@@ -132,6 +143,8 @@ function updateBoard(board: board): void {
 
     return;
 }
+
+
 
 
 
@@ -171,13 +184,16 @@ function setUpSocket() {
     return;
 }
 
-function populateGameBoard() {
+function createBlankBoard(): void {
 
     for (let row = 0; row < 11; row++) {
         gameBoardDiv.appendChild(createRow(row));
     }
 
     gameBoardDiv.classList.remove("nodisp");
+
+    console.log(gameBoard);
+    console.log(gameBoardDisplay);
 
     return;
 }
@@ -188,19 +204,25 @@ function createRow(row: number): HTMLDivElement {
     let oddeven = (row % 2 === 0) ? "even" : "odd";
     rowDiv.classList.add("row", `r${row}`, oddeven);
 
+    gameBoard.push([]);
+    gameBoardDisplay.push([]);
+
     for (let col = 0; col < 11; col++) {
-        rowDiv.appendChild(createTile([row, col]));
+        rowDiv.appendChild(createTile(row, col));
     }
 
     return rowDiv;
 }
 
-function createTile(coordinate: coordinate): HTMLDivElement {
+function createTile(row: number, col: number): HTMLDivElement {
 
     let tile: HTMLDivElement = document.createElement("div") as HTMLDivElement;
-    let oddeven = (coordinate[1] % 2 === 0) ? "even" : "odd";
-    tile.classList.add("tile", `c${coordinate[1]}`, oddeven);
-    tile.id = `${coordinate[0]}${coordinate[1]}`;
+    let oddeven = (col % 2 === 0) ? "even" : "odd";
+    tile.classList.add("tile", `c${col}`, oddeven);
+    tile.id = `r${row}c${col}`;
+
+    gameBoard[row].push(new Tile([row,col]));
+    gameBoardDisplay[row].push(tile);
 
     return tile;
 }
@@ -299,8 +321,9 @@ function init() {
     addHandlers();
     setUpSocket();
 
-    populateGameBoard();
-    spawnShips();
+    createBlankBoard();
+    //populateGameBoard();
+    //spawnShips();
 
 
     console.log("initialized");

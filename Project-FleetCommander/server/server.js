@@ -52,7 +52,7 @@ function addPlayerToGame(socket, game, player) {
         socket.player = player;
         sendMessage(socket.game, `${socket.player} has joined the game`);
         socket.join(socket.game);
-        socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog);
+        socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog, Games.games[socket.game].board.board);
     }
     return;
 }

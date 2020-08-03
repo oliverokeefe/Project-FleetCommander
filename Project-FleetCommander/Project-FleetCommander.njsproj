@@ -89,13 +89,7 @@
     <Folder Include="shared\src\types\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="client\src\classes\devPlayerControl.ts" />
-    <TypeScriptCompile Include="client\src\classes\PlayerModel.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="client\src\classes\PriorityQueue.ts" />
-    <TypeScriptCompile Include="client\src\classes\testControl.ts" />
-    <TypeScriptCompile Include="client\src\classes\testData.ts" />
     <TypeScriptCompile Include="client\src\scripts\devScript.ts" />
     <TypeScriptCompile Include="client\src\scripts\main.ts" />
     <TypeScriptCompile Include="client\src\scripts\testScript.ts" />
@@ -114,12 +108,6 @@
     <TypeScriptCompile Include="server\src\classes\Ships.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="shared\src\classes\Actions.ts" />
-    <TypeScriptCompile Include="shared\src\classes\Dice.ts" />
-    <TypeScriptCompile Include="shared\src\classes\Game.ts" />
-    <TypeScriptCompile Include="shared\src\classes\Player.ts" />
-    <TypeScriptCompile Include="shared\src\classes\testAction.ts" />
-    <TypeScriptCompile Include="shared\src\classes\testPlayer.ts" />
     <TypeScriptCompile Include="shared\src\types\types.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
