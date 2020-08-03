@@ -6,6 +6,7 @@ import { joinData, gameList } from '../shared/src/types/types';
 import { Player } from '../shared/src/classes/Player';
 import { Server } from 'socket.io';
 import { Board } from '../shared/src/classes/GameBoard';
+import { Game, GameList } from './src/classes/Game';
 
 const app = express();
 let http = require('http').createServer(app);
@@ -24,9 +25,9 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
-let GameList: gameList = {};
-let GameBoard: Board = new Board();
-console.log(GameBoard.toString());
+let Games: GameList = new GameList();
+let testBoard: Board = new Board();
+console.log(testBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ///Helpful functions for creating/joining or leaving/deleting a game.
@@ -34,8 +35,8 @@ console.log(GameBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function sendMessage(game: string, message: string) {
-    if (gameExists(game)) {
-        GameList[game].chatLog.push(message);
+    if (Games.gameExists(game)) {
+        Games.games[game].chatLog.push(message);
         io.to(game).emit('chat', message);
     }
     return
@@ -55,15 +56,13 @@ function addPlayerToGame(socket: SocketIO.Socket, game?: string, player?: string
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
 
-    if (!gameExists(game)) {
+    if (!Games.gameExists(game)) {
         createNewGame(game);
     }
 
-    if (!playerInGame(game, player)) {
+    if (!Games.playerInGame(game, player)) {
 
-        GameList[game].playerList[player] = player;
-        GameList[game].playerCount++;
-        //Later player will be class so this would use a constructor
+        Games.addPlayerToGame(game, player);
 
         socket.game = game;
         socket.player = player;
@@ -79,14 +78,10 @@ function addPlayerToGame(socket: SocketIO.Socket, game?: string, player?: string
 
 
 function createNewGame(game: string): void {
-    GameList[game] = {
-        name: game,
-        chatLog: [],
-        playerList: {},
-        playerCount: 0
-    };
-    //later Game should be a class and this would just
-    //be a constructor call..but for now...here
+
+    Games.createGame(game);
+
+    return;
 }
 
 function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: string): void {
@@ -94,10 +89,8 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
 
-    if (playerInGame(game, player) && socket.game && socket.player) {
-        delete GameList[game].playerList[player]
-        GameList[game].playerCount--;
-        deleteGameIfEmpty(game);
+    if (Games.playerInGame(game, player) && socket.game && socket.player) {
+        Games.removePlayerFromGame(game, player);
 
         sendMessage(socket.game, `${socket.player} has left the game`)
 
@@ -105,20 +98,6 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
         socket.game = "";
     }
 
-}
-
-function deleteGameIfEmpty(game: string): void {
-    if (GameList[game] && GameList[game].playerCount < 1) {
-        delete GameList[game];
-    }
-}
-
-function gameExists(game: string): boolean {
-    return (GameList[game]) ? true : false;
-}
-
-function playerInGame(game, player): boolean {
-    return (GameList[game] && GameList[game].playerList[player]) ? true : false;
 }
 
 ///++++++++++++++++++++++++++++++++++++++++++++++++++

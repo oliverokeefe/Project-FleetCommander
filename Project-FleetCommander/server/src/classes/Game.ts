@@ -6,13 +6,14 @@ import { Board } from "../../../shared/src/classes/GameBoard";
 export class Game {
 
     public name: string;
-    public size: number;
+    public playerCount: number;
     public players: { [player: string]: Player }
+    public chatLog: string[];
     public board: Board;
 
     constructor(name: string) {
         this.name = name;
-        this.size = 0;
+        this.playerCount = 0;
         this.players = {};
         this.board = new Board();
     }
@@ -20,7 +21,7 @@ export class Game {
     public addPlayer(player: string): void {
         if (!this.players[player]) {
             this.players[player] = new Player(player);
-            this.size++;
+            this.playerCount++;
             this.board.territories.forEach((territory) => {
                 if (!territory.player && !this.players[player].territory) {
                     territory.player = this.players[player].name;
@@ -40,7 +41,7 @@ export class Game {
                 }
             });
             delete this.players[player];
-            this.size--;
+            this.playerCount--;
         }
         return;
     }
@@ -85,11 +86,25 @@ export class GameList {
     public removePlayerFromGame(game: string, player: string): void {
         if (this.games[game]) {
             this.games[game].removePlayer(player);
-            if (this.games[game].size === 0) {
+            if (this.games[game].playerCount === 0) {
                 this.deleteGame(game);
             }
         }
         return;
+    }
+
+    public gameExists(game: string): boolean {
+        return (this.games[game]) ? true : false;
+    }
+
+    public deleteGameIfEmpty(game: string): void {
+        if (this.games[game] && this.games[game].playerCount < 1) {
+            this.deleteGame(game);
+        }
+    }
+
+    public playerInGame(game, player): boolean {
+        return (this.games[game] && this.games[game].players[player]) ? true : false;
     }
 
 }

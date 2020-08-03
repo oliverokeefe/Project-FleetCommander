@@ -4,6 +4,7 @@ const debug = require("debug");
 const express = require("express");
 const path = require("path");
 const GameBoard_1 = require("../shared/src/classes/GameBoard");
+const Game_1 = require("./src/classes/Game");
 const app = express();
 let http = require('http').createServer(app);
 let io = require('socket.io')(http);
@@ -17,16 +18,16 @@ app.get('/', (req, res) => {
 app.use(express.static(path.join(__dirname, '../client/public')));
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
-let GameList = {};
-let GameBoard = new GameBoard_1.Board();
-console.log(GameBoard.toString());
+let Games = new Game_1.GameList();
+let testBoard = new GameBoard_1.Board();
+console.log(testBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 ///Helpful functions for creating/joining or leaving/deleting a game.
 ///as well as creating/updating or removing a character.
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 function sendMessage(game, message) {
-    if (gameExists(game)) {
-        GameList[game].chatLog.push(message);
+    if (Games.gameExists(game)) {
+        Games.games[game].chatLog.push(message);
         io.to(game).emit('chat', message);
     }
     return;
@@ -42,53 +43,32 @@ function isValidJoinData(joinData) {
 function addPlayerToGame(socket, game, player) {
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
-    if (!gameExists(game)) {
+    if (!Games.gameExists(game)) {
         createNewGame(game);
     }
-    if (!playerInGame(game, player)) {
-        GameList[game].playerList[player] = player;
-        GameList[game].playerCount++;
-        //Later player will be class so this would use a constructor
+    if (!Games.playerInGame(game, player)) {
+        Games.addPlayerToGame(game, player);
         socket.game = game;
         socket.player = player;
         sendMessage(socket.game, `${socket.player} has joined the game`);
         socket.join(socket.game);
-        socket.emit('joinGame', GameList[socket.game], socket.player);
+        socket.emit('joinGame', Game_1.GameList[socket.game], socket.player);
     }
     return;
 }
 function createNewGame(game) {
-    GameList[game] = {
-        name: game,
-        chatLog: [],
-        playerList: {},
-        playerCount: 0
-    };
-    //later Game should be a class and this would just
-    //be a constructor call..but for now...here
+    Games.createGame(game);
+    return;
 }
 function removePlayerFromGame(socket, game, player) {
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
-    if (playerInGame(game, player) && socket.game && socket.player) {
-        delete GameList[game].playerList[player];
-        GameList[game].playerCount--;
-        deleteGameIfEmpty(game);
+    if (Games.playerInGame(game, player) && socket.game && socket.player) {
+        Games.removePlayerFromGame(game, player);
         sendMessage(socket.game, `${socket.player} has left the game`);
         socket.leave(socket.game);
         socket.game = "";
     }
-}
-function deleteGameIfEmpty(game) {
-    if (GameList[game] && GameList[game].playerCount < 1) {
-        delete GameList[game];
-    }
-}
-function gameExists(game) {
-    return (GameList[game]) ? true : false;
-}
-function playerInGame(game, player) {
-    return (GameList[game] && GameList[game].playerList[player]) ? true : false;
 }
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 io.on('connection', (socket) => {

@@ -6,14 +6,14 @@ const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
 class Game {
     constructor(name) {
         this.name = name;
-        this.size = 0;
+        this.playerCount = 0;
         this.players = {};
         this.board = new GameBoard_1.Board();
     }
     addPlayer(player) {
         if (!this.players[player]) {
             this.players[player] = new Player_1.Player(player);
-            this.size++;
+            this.playerCount++;
             this.board.territories.forEach((territory) => {
                 if (!territory.player && !this.players[player].territory) {
                     territory.player = this.players[player].name;
@@ -32,7 +32,7 @@ class Game {
                 }
             });
             delete this.players[player];
-            this.size--;
+            this.playerCount--;
         }
         return;
     }
@@ -66,11 +66,22 @@ class GameList {
     removePlayerFromGame(game, player) {
         if (this.games[game]) {
             this.games[game].removePlayer(player);
-            if (this.games[game].size === 0) {
+            if (this.games[game].playerCount === 0) {
                 this.deleteGame(game);
             }
         }
         return;
+    }
+    gameExists(game) {
+        return (this.games[game]) ? true : false;
+    }
+    deleteGameIfEmpty(game) {
+        if (this.games[game] && this.games[game].playerCount < 1) {
+            this.deleteGame(game);
+        }
+    }
+    playerInGame(game, player) {
+        return (this.games[game] && this.games[game].players[player]) ? true : false;
     }
 }
 exports.GameList = GameList;
