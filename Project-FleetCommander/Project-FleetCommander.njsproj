@@ -89,7 +89,10 @@
     <Folder Include="shared\src\types\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="client\src\classes\GameData.ts" />
+    <TypeScriptCompile Include="client\src\classes\PlayerData.ts" />
     <TypeScriptCompile Include="client\src\classes\PriorityQueue.ts" />
+    <TypeScriptCompile Include="client\src\classes\Ships.ts" />
     <TypeScriptCompile Include="client\src\scripts\devScript.ts" />
     <TypeScriptCompile Include="client\src\scripts\main.ts" />
     <TypeScriptCompile Include="client\src\scripts\testScript.ts" />

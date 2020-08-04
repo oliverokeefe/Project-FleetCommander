@@ -124,22 +124,18 @@ function updateBoard(board: board): void {
 
     gameBoard = board;
 
-    gameBoard.forEach((row: Tile[]) => {
-        row.forEach((tile: Tile) => {
+    gameBoard.forEach((tiles: Tile[], row) => {
+        tiles.forEach((tile: Tile, col) => {
+
+            //tile has the info to display
+            //gameBoardDisplay[row][col] is where to display the information
+
 
         });
     });
 
-    //loop through gameBoard and reander each tile
+    //loop through gameBoard and render each tile
         //Add ships or remove ships as necessary
-
-
-        //Render:
-        //Hide game board element
-        //-Create Div for the tile
-        //-create any HTML elements necessary for pieces on the tile and add them as children
-        //-add the tile element to the board element
-        //Unhide game board element
 
     return;
 }
