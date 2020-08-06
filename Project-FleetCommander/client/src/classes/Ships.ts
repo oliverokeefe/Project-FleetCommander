@@ -2,6 +2,20 @@
 import { coordinate } from '../../../shared/src/types/types';
 import { Board, Tile } from '../../../shared/src/classes/GameBoard';
 
+
+//***** Client ships
+
+/*
+ * Client side ship data
+ * 
+ * Handles ship display,
+ *  ship movement,
+ *  click events on the ships (show ships that can move this turn, show valid moves)
+ * 
+ * ignore building ships for now
+ */
+
+
 export abstract class Ship {
 
     abstract readonly shipClass: string;

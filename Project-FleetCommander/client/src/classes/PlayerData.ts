@@ -3,6 +3,15 @@ import { Ship } from "./Ships";
 
 
 
+/*
+ * 
+ * Keep track of player resources (ships, points)
+ * 
+ * SENDS turn updates to server
+ * 
+ */
+
+
 export class PlayerData {
 
     public name: string;
