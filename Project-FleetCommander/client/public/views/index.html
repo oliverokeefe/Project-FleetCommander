@@ -11,28 +11,43 @@
     <body>
         <h1>WOOOOO</h1>
         <div>
+            <!--Config for joining/creating game-->
             <div id="Config">
                 <input id="GameInput" type="text" value="Game1" />
-                <input id="PlayerInput" type="text" value="Player1" />
                 <button id="JoinBtn">Join</button>
             </div>
-            <div id="Game">
-                <div id="GameInfo">
-                    <div id="GameName">Game:</div>
-                </div>
-                <div id="PlayerInfo">
-                    <div id="PlayerName">Name:</div>
-                </div>
-                <div id="box">
-                    <div id="GameBoard" class="board boxItem nodisp"></div>
-                    <div id="Chat" class="boxItem">
-                        <div id="ChatLog">
-                            <div id="ChatLogTop"></div>
-                        </div>
-                        <input id="ChatInput" type="text" placeholder="message..." />
-
+            <!--Lobby to wait for all players to ready up and personalize-->
+            <div id="Lobby" class="nodisp">
+                <div id="GameName">Game:</div>
+                <input id="PlayerInput" type="text" value="Player1" />
+                <button id="ReadyBtn">Ready</button>
+                <div id="Chat">
+                    <div id="ChatLog">
+                        <div id="ChatLogTop"></div>
                     </div>
                 </div>
+                <input id="ChatInput" type="text" placeholder="message..." />
+            </div>
+            <!--The actual game display-->
+            <div id="Game" class="nodisp">
+                
+                <div id="box">
+                    <div id="GameInfo">
+                        <div id="PlayerInfo" class="boxItem">
+                            <div id="PlayerName">Name:</div>
+                            <div id="PlayerScore"></div>
+                        </div>
+                        <div id="TurnCounter"></div>
+                        <div id="Scores">
+                            <div id="Player1Score"></div>
+                            <div id="Player2Score"></div>
+                            <div id="Player3Score"></div>
+                            <div id="Player4Score"></div>
+                        </div>
+                    </div>
+                    <div id="GameBoard" class="board boxItem nodisp"></div>
+                </div>
+
             </div>
         </div>
     </body>

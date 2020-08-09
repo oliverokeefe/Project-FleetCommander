@@ -1,11 +1,13 @@
 
 import type { joinData, game, board, coordinate } from '../../../shared/src/types/types';
 import { Board, Territory, Tile } from '../../../shared/src/classes/GameBoard.js';
+import { GameData } from '../classes/GameData.js';
+import { PlayerData } from '../classes/PlayerData.js';
 
 let socket: SocketIOClient.Socket = undefined;
 
-let Game: string = "";
-let Player: string = "";
+let Game: GameData = undefined;
+let Player: PlayerData = undefined;
 
 let gameBoardDiv: HTMLDivElement = undefined;
 let gameBoardDisplay: HTMLDivElement[][] = [];
@@ -145,40 +147,6 @@ function updateBoard(board: board): void {
 
 
 
-function populateDOMElementVariables() {
-    gameNameDisplay = document.getElementById("GameName") as HTMLDivElement;
-    playerNameDisplay = document.getElementById("PlayerName") as HTMLDivElement;
-
-
-    chatLogDisplay = document.getElementById("ChatLog") as HTMLDivElement;
-    chatInput = document.getElementById("ChatInput") as HTMLInputElement;
-
-
-    gameInput = document.getElementById("GameInput") as HTMLInputElement;
-    playerInput = document.getElementById("PlayerInput") as HTMLInputElement;
-    joinBtn = document.getElementById("JoinBtn") as HTMLButtonElement;
-
-    gameBoardDiv = document.getElementById("GameBoard") as HTMLDivElement;
-
-    return;
-}
-
-function addHandlers() {
-
-    chatInput.addEventListener("keydown", chatInputHandler);
-
-
-    joinBtn.addEventListener("click", joinBtnHandler);
-
-    return;
-}
-
-function setUpSocket() {
-    socket = io();
-    socket.on('chat', getMessage);
-    socket.on('joinGame', joinGame);
-    return;
-}
 
 function createBlankBoard(): void {
 
@@ -311,24 +279,71 @@ function spawnShip(playerPieceClass, shipClass, coordinate) {
     return;
 }
 
-function init() {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function joinLobby(game: string): void {
+
+
+
+    return;
+}
+
+
+
+
+function populateDOMElementVariables() {
+    gameInput = document.getElementById("GameInput") as HTMLInputElement;
+    joinBtn = document.getElementById("JoinBtn") as HTMLButtonElement;
+    return;
+}
+
+function addHandlers() {
+    joinBtn.addEventListener("click", joinBtnHandler);
+    //chatInput.addEventListener("keydown", chatInputHandler);
+    return;
+}
+
+function setUpSocket() {
+    socket = io();
+    socket.on('joinLobby', joinLobby);
+    return;
+}
+
+
+function init() {
     populateDOMElementVariables();
     addHandlers();
     setUpSocket();
-
-    createBlankBoard();
+    //createBlankBoard();
     //populateGameBoard();
     //spawnShips();
-
-
     console.log("initialized");
     return;
 }
 
 window.onload = function () {
     init();
-
     return;
 };
 

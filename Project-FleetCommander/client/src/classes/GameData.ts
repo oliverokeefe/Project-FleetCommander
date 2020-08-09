@@ -14,6 +14,7 @@ import { Board } from "../../../shared/src/classes/GameBoard";
 export class GameData {
 
     public name: string;
+    public display: HTMLDivElement;
     //public players: { [player: string]: PlayerData }
     public player: PlayerData;
     public chatLog: string[];
@@ -30,11 +31,13 @@ export class GameData {
     //****
 
 
-    constructor(name: string) {
+    constructor(name: string, gameDiv: HTMLDivElement) {
         this.name = name;
+        this.display = gameDiv;
         this.player = undefined;
         this.chatLog = [];
         this.board = new Board();
+
     }
 
     /**
