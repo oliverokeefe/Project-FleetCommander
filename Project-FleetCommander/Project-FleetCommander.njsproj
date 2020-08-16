@@ -89,12 +89,17 @@
     <Folder Include="shared\src\types\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="client\src\classes\GameData.ts" />
-    <TypeScriptCompile Include="client\src\classes\PlayerData.ts" />
+    <TypeScriptCompile Include="client\src\classes\ConfigSection.ts" />
+    <TypeScriptCompile Include="client\src\classes\Lobby.ts" />
+    <TypeScriptCompile Include="client\src\classes\Chat.ts" />
+    <TypeScriptCompile Include="client\src\classes\MainModel.ts" />
+    <TypeScriptCompile Include="client\src\classes\GameModel.ts" />
+    <TypeScriptCompile Include="client\src\classes\PlayerModel.ts" />
     <TypeScriptCompile Include="client\src\classes\PriorityQueue.ts" />
     <TypeScriptCompile Include="client\src\classes\Ships.ts" />
     <TypeScriptCompile Include="client\src\scripts\devScript.ts" />
     <TypeScriptCompile Include="client\src\scripts\main.ts" />
+    <TypeScriptCompile Include="client\src\scripts\main2.ts" />
     <TypeScriptCompile Include="client\src\scripts\testScript.ts" />
     <TypeScriptCompile Include="server\routes\classes.ts" />
     <TypeScriptCompile Include="server\routes\scripts.ts" />

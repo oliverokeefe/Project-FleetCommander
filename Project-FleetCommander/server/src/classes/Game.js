@@ -7,34 +7,81 @@ class Game {
     constructor(name) {
         this.name = name;
         this.playerCount = 0;
-        this.players = {};
+        //this.players = {};
+        this.players = {
+            Player1: undefined,
+            Player2: undefined,
+            Player3: undefined,
+            Player4: undefined
+        };
         this.chatLog = [];
         this.board = new GameBoard_1.Board();
     }
-    addPlayer(player) {
-        if (!this.players[player]) {
-            this.players[player] = new Player_1.Player(player);
+    addPlayer(id, name) {
+        let success = false;
+        if (this.players.hasOwnProperty(id) && !this.players[id]) {
+            this.players[id] = new Player_1.Player(id, name);
             this.playerCount++;
             this.board.territories.forEach((territory) => {
-                if (!territory.player && !this.players[player].territory) {
-                    territory.player = this.players[player].name;
-                    this.players[player].territory = territory;
+                if (!territory.player || !this.players[id].territory) {
+                    territory.player = this.players[id].id;
+                    this.players[id].territory = territory;
                 }
             });
+            success = true;
         }
-        return;
+        return success;
     }
-    removePlayer(player) {
-        if (this.players[player]) {
+    tryAddPlayer(playerName) {
+        let success = false;
+        let firstAvailableId = this.getFirstAvailablePlayerSlot();
+        playerName = (playerName) ? playerName : firstAvailableId;
+        if (firstAvailableId) {
+            success = this.addPlayer(firstAvailableId, playerName);
+        }
+        return (success) ? firstAvailableId : "";
+    }
+    /**
+     * TODO
+     */
+    addSpectator() {
+        //really just need to increment a counter
+        //Spectators have no need for a data model
+        return false;
+    }
+    removePlayer(playerId) {
+        let success = false;
+        if (this.players[playerId]) {
             this.board.territories.forEach((territory) => {
-                if (territory.player === this.players[player].name) {
+                if (territory.player === this.players[playerId].id) {
                     territory.player = "";
-                    this.players[player].territory = undefined;
+                    this.players[playerId].territory = undefined;
                 }
             });
-            delete this.players[player];
+            this.players[playerId] = undefined;
             this.playerCount--;
+            success = true;
         }
+        return success;
+    }
+    /**
+     * TODO
+     */
+    removeSpectator() {
+        //just decrement the spectator counter
+        return false;
+    }
+    getFirstAvailablePlayerSlot() {
+        let ids = Object.keys(this.players);
+        let firstAvailable = undefined;
+        ids.forEach((id) => {
+            if (!this.players[id]) {
+                firstAvailable = (firstAvailable) ? firstAvailable : id;
+            }
+        });
+        return firstAvailable;
+    }
+    readyPlayer(playerId) {
         return;
     }
 }
@@ -58,11 +105,34 @@ class GameList {
         }
         return;
     }
-    addPlayerToGame(game, player) {
+    addPlayerToGame(game, playerId) {
         if (this.games[game]) {
-            this.games[game].addPlayer(player);
+            this.games[game].addPlayer(playerId);
         }
         return;
+    }
+    readyPlayerInGame(game, playerId) {
+        if (this.games[game]) {
+            this.games[game].readyPlayer(playerId);
+        }
+        return;
+    }
+    tryAddPlayerToGame(game, playerName) {
+        let playerId = "";
+        if (this.games[game]) {
+            playerId = this.games[game].tryAddPlayer(playerName);
+        }
+        return playerId;
+    }
+    /**
+     * TODO
+     */
+    addSpectatorToGame(game) {
+        let success = false;
+        if (this.games[game]) {
+            success = this.games[game].addSpectator();
+        }
+        return success;
     }
     removePlayerFromGame(game, player) {
         if (this.games[game]) {
@@ -72,6 +142,16 @@ class GameList {
             }
         }
         return;
+    }
+    /**
+     * TODO
+     */
+    removeSpectatorFromGame(game) {
+        let success = false;
+        if (this.games[game]) {
+            success = this.games[game].removeSpectator();
+        }
+        return success;
     }
     gameExists(game) {
         return (this.games[game]) ? true : false;

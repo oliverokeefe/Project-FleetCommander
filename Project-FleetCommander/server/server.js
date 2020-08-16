@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
 const express = require("express");
 const path = require("path");
-const GameBoard_1 = require("../shared/src/classes/GameBoard");
 const Game_1 = require("./src/classes/Game");
 const app = express();
 let http = require('http').createServer(app);
@@ -19,8 +18,12 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 let Games = new Game_1.GameList();
-let testBoard = new GameBoard_1.Board();
-console.log(testBoard.toString());
+/**
+ * General spectator ID
+ */
+let GenSpecId = "Spectator";
+//let testBoard: Board = new Board();
+//console.log(testBoard.toString());
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 ///Helpful functions for creating/joining or leaving/deleting a game.
 ///as well as creating/updating or removing a character.
@@ -40,19 +43,53 @@ function isValidJoinData(joinData) {
         return false;
     }
 }
-function addPlayerToGame(socket, game, player) {
+function addPlayerToGame(socket, game, playerId) {
     game = (game) ? game : socket.game;
-    player = (player) ? player : socket.player;
+    playerId = (playerId) ? playerId : socket.player;
     if (!Games.gameExists(game)) {
         createNewGame(game);
     }
-    if (!Games.playerInGame(game, player)) {
-        Games.addPlayerToGame(game, player);
+    if (playerId === GenSpecId) {
+        Games.addSpectatorToGame(game);
         socket.game = game;
-        socket.player = player;
+        socket.player = playerId;
+        socket.join(socket.game);
+        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
+    }
+    else if (!Games.playerInGame(game, playerId)) {
+        Games.addPlayerToGame(game, playerId);
+        socket.game = game;
+        socket.player = playerId;
         sendMessage(socket.game, `${socket.player} has joined the game`);
         socket.join(socket.game);
         socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog, Games.games[socket.game].board.board);
+    }
+    return;
+}
+function addPlayerToLobby(socket, game) {
+    game = (game) ? game : socket.game;
+    if (!Games.gameExists(game)) {
+        createNewGame(game);
+    }
+    let playerId = Games.tryAddPlayerToGame(game);
+    console.log(`Join ${game} lobby attempt by ${playerId}`);
+    if (playerId) {
+        socket.game = game;
+        socket.player = playerId;
+        sendMessage(socket.game, `${socket.player} has joined the lobby`);
+        socket.join(socket.game);
+        socket.emit('joinLobby', socket.game);
+        socket.emit('updateChat', Games.games[socket.game].chatLog);
+        console.log(`${socket.player} has joined the ${socket.game} lobby`);
+    }
+    else {
+        //Add as Spectator
+        //Should look the same as above but with a call to Game.addAsSpectator()
+        Games.addSpectatorToGame(game);
+        socket.game = game;
+        socket.player = GenSpecId;
+        socket.join(socket.game);
+        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
     }
     return;
 }
@@ -63,12 +100,22 @@ function createNewGame(game) {
 function removePlayerFromGame(socket, game, player) {
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
-    if (Games.playerInGame(game, player) && socket.game && socket.player) {
+    if (player === GenSpecId) {
+        //remove spectator
+    }
+    else if (Games.playerInGame(game, player) && socket.game && socket.player) {
         Games.removePlayerFromGame(game, player);
         sendMessage(socket.game, `${socket.player} has left the game`);
         socket.leave(socket.game);
         socket.game = "";
     }
+}
+function readyUp(game, playerId) {
+    if (Games.gameExists(game)) {
+        Games.readyPlayerInGame(game, playerId);
+        sendMessage(game, `${playerId} Ready!`);
+    }
+    return;
 }
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 io.on('connection', (socket) => {
@@ -78,6 +125,12 @@ io.on('connection', (socket) => {
     socket.player = "";
     socket.game = "";
     ///++++++++++++++++++++++++++++++++++++++++++++++++++
+    socket.on('joinLobby', (game) => {
+        if (game) {
+            console.log(`Attempt to join ${game} lobby`);
+            addPlayerToLobby(socket, game);
+        }
+    });
     socket.on('joinGame', (joinData) => {
         if (isValidJoinData(joinData)) {
             addPlayerToGame(socket, joinData.game, joinData.player);
@@ -90,6 +143,9 @@ io.on('connection', (socket) => {
         else {
             socket.emit('chat', message);
         }
+    });
+    socket.on('ready', () => {
+        readyUp(socket.game, socket.player);
     });
     socket.on('leaveGame', () => {
         removePlayerFromGame(socket);

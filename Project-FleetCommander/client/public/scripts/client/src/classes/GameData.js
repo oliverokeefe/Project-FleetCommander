@@ -7,7 +7,7 @@ import { Board } from "../../../shared/src/classes/GameBoard";
  * RECEIVES turn updates from server
  *
  */
-export class GameModel {
+export class GameData {
     //DisplayDivs
     //Game
     //Board
@@ -62,4 +62,4 @@ export class GameModel {
         return;
     }
 }
-//# sourceMappingURL=GameModel.js.map
+//# sourceMappingURL=GameData.js.map

@@ -5,7 +5,7 @@
  * SENDS turn updates to server
  *
  */
-export class PlayerModel {
+export class PlayerData {
     constructor(name) {
         this.name = name;
         this.score = 0;
@@ -27,4 +27,4 @@ export class PlayerModel {
         return;
     }
 }
-//# sourceMappingURL=PlayerModel.js.map
+//# sourceMappingURL=PlayerData.js.map

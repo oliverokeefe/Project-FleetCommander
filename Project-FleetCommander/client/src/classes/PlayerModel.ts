@@ -1,5 +1,5 @@
-import { Territory } from "../../../shared/src/classes/GameBoard";
-import { Ship } from "./Ships";
+import { Territory } from "../../../shared/src/classes/GameBoard.js";
+import { Ship } from "./Ships.js";
 
 
 
@@ -12,7 +12,7 @@ import { Ship } from "./Ships";
  */
 
 
-export class PlayerData {
+export class PlayerModel {
 
     public name: string;
     public score: number;

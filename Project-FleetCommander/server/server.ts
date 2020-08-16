@@ -25,9 +25,17 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 
 ///Game Sessions Data
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
+
 let Games: GameList = new GameList();
-let testBoard: Board = new Board();
-console.log(testBoard.toString());
+
+/**
+ * General spectator ID
+ */
+let GenSpecId: string = "Spectator";
+
+//let testBoard: Board = new Board();
+//console.log(testBoard.toString());
+
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ///Helpful functions for creating/joining or leaving/deleting a game.
@@ -39,7 +47,7 @@ function sendMessage(game: string, message: string) {
         Games.games[game].chatLog.push(message);
         io.to(game).emit('chat', message);
     }
-    return
+    return;
 }
 
 function isValidJoinData(joinData: joinData): boolean {
@@ -51,26 +59,79 @@ function isValidJoinData(joinData: joinData): boolean {
     }
 }
 
-function addPlayerToGame(socket: SocketIO.Socket, game?: string, player?: string): void {
+function addPlayerToGame(socket: SocketIO.Socket, game?: string, playerId?: string): boolean {
 
     game = (game) ? game : socket.game;
-    player = (player) ? player : socket.player;
+    playerId = (playerId) ? playerId : socket.player;
 
     if (!Games.gameExists(game)) {
         createNewGame(game);
     }
 
-    if (!Games.playerInGame(game, player)) {
+    if (playerId === GenSpecId) {
 
-        Games.addPlayerToGame(game, player);
+        Games.addSpectatorToGame(game);
 
         socket.game = game;
-        socket.player = player;
+        socket.player = playerId;
+
+        socket.join(socket.game);
+        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
+
+    } else if (!Games.playerInGame(game, playerId)) {
+
+        Games.addPlayerToGame(game, playerId);
+
+        socket.game = game;
+        socket.player = playerId;
 
         sendMessage(socket.game, `${socket.player} has joined the game`);
 
         socket.join(socket.game);
         socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog, Games.games[socket.game].board.board);
+    }
+
+    return;
+}
+
+function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
+
+    game = (game) ? game : socket.game;
+
+    if (!Games.gameExists(game)) {
+        createNewGame(game);
+    }
+
+    let playerId: string = Games.tryAddPlayerToGame(game);
+
+    console.log(`Join ${game} lobby attempt by ${playerId}`)
+
+    if (playerId) {
+
+        socket.game = game;
+        socket.player = playerId;
+
+        sendMessage(socket.game, `${socket.player} has joined the lobby`);
+
+        socket.join(socket.game);
+        socket.emit('joinLobby', socket.game);
+        socket.emit('updateChat', Games.games[socket.game].chatLog);
+
+        console.log(`${socket.player} has joined the ${socket.game} lobby`);
+
+    } else {
+
+        //Add as Spectator
+        //Should look the same as above but with a call to Game.addAsSpectator()
+
+        Games.addSpectatorToGame(game);
+
+        socket.game = game;
+        socket.player = GenSpecId;
+
+        socket.join(socket.game);
+        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
+
     }
 
     return;
@@ -89,7 +150,11 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
     game = (game) ? game : socket.game;
     player = (player) ? player : socket.player;
 
-    if (Games.playerInGame(game, player) && socket.game && socket.player) {
+    if (player === GenSpecId) {
+
+        //remove spectator
+
+    } else if (Games.playerInGame(game, player) && socket.game && socket.player) {
         Games.removePlayerFromGame(game, player);
 
         sendMessage(socket.game, `${socket.player} has left the game`)
@@ -98,6 +163,14 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
         socket.game = "";
     }
 
+}
+
+function readyUp(game: string, playerId: string): void {
+    if (Games.gameExists(game)) {
+        Games.readyPlayerInGame(game, playerId);
+        sendMessage(game, `${playerId} Ready!`)
+    }
+    return;
 }
 
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -114,6 +187,13 @@ io.on('connection', (socket: SocketIO.Socket) => {
     socket.game = "";
     ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
+    socket.on('joinLobby', (game: string) => {
+        if (game) {
+            console.log(`Attempt to join ${game} lobby`);
+            addPlayerToLobby(socket, game);
+        }
+    });
+
     socket.on('joinGame', (joinData: joinData) => {
         if (isValidJoinData(joinData)) {
             addPlayerToGame(socket, joinData.game, joinData.player);
@@ -127,6 +207,10 @@ io.on('connection', (socket: SocketIO.Socket) => {
         else {
             socket.emit('chat', message);
         }
+    });
+
+    socket.on('ready', () => {
+        readyUp(socket.game, socket.player);
     });
 
     socket.on('leaveGame', () => {

@@ -7,46 +7,112 @@ export class Game {
 
     public name: string;
     public playerCount: number;
-    public players: { [player: string]: Player }
+    //public players: { [player: string]: Player }
+    public players: {
+        Player1: Player,
+        Player2: Player,
+        Player3: Player,
+        Player4: Player
+    }
     public chatLog: string[];
     public board: Board;
 
     constructor(name: string) {
         this.name = name;
         this.playerCount = 0;
-        this.players = {};
+        //this.players = {};
+        this.players = {
+            Player1: undefined,
+            Player2: undefined,
+            Player3: undefined,
+            Player4: undefined
+        }
         this.chatLog = [];
         this.board = new Board();
     }
 
-    public addPlayer(player: string): void {
-        if (!this.players[player]) {
-            this.players[player] = new Player(player);
+    public addPlayer(id: string, name?: string): boolean {
+        let success: boolean = false;
+        if (this.players.hasOwnProperty(id) && !this.players[id]) {
+            this.players[id] = new Player(id, name);
             this.playerCount++;
             this.board.territories.forEach((territory) => {
-                if (!territory.player && !this.players[player].territory) {
-                    territory.player = this.players[player].name;
-                    this.players[player].territory = territory;
+                if (!territory.player || !this.players[id].territory) {
+                    territory.player = this.players[id].id;
+                    this.players[id].territory = territory;
                 }
             });
+            success = true;
         }
-        return;
+        return success;
     }
 
-    public removePlayer(player: string): void {
-        if (this.players[player]) {
+    public tryAddPlayer(playerName?: string): string {
+        let success: boolean = false;
+        let firstAvailableId: string = this.getFirstAvailablePlayerSlot();
+        playerName = (playerName) ? playerName : firstAvailableId;
+
+        if (firstAvailableId) {
+            success = this.addPlayer(firstAvailableId, playerName);
+        }
+
+        return (success) ? firstAvailableId : "";
+    }
+
+    /**
+     * TODO
+     */
+    public addSpectator(): boolean {
+
+        //really just need to increment a counter
+        //Spectators have no need for a data model
+
+        return false;
+    }
+
+    public removePlayer(playerId: string): boolean {
+        let success: boolean = false;
+        if (this.players[playerId]) {
             this.board.territories.forEach((territory) => {
-                if (territory.player === this.players[player].name) {
+                if (territory.player === this.players[playerId].id) {
                     territory.player = "";
-                    this.players[player].territory = undefined;
+                    this.players[playerId].territory = undefined;
                 }
             });
-            delete this.players[player];
+            this.players[playerId] = undefined;
             this.playerCount--;
+            success = true;
         }
-        return;
+        return success;
     }
 
+    /**
+     * TODO
+     */
+    public removeSpectator(): boolean {
+
+        //just decrement the spectator counter
+
+        return false
+    }
+
+    public getFirstAvailablePlayerSlot(): string {
+
+        let ids = Object.keys(this.players);
+        let firstAvailable: string = undefined;
+        ids.forEach((id) => {
+            if (!this.players[id]) {
+                firstAvailable = (firstAvailable) ? firstAvailable : id;
+            }
+        });
+
+        return firstAvailable;
+    }
+
+    public readyPlayer(playerId): void {
+
+        return;
+    }
 
 }
 
@@ -77,11 +143,37 @@ export class GameList {
         return;
     }
 
-    public addPlayerToGame(game: string, player: string): void {
+    public addPlayerToGame(game: string, playerId: string): void {
         if (this.games[game]) {
-            this.games[game].addPlayer(player);
+            this.games[game].addPlayer(playerId);
         }
         return;
+    }
+
+    public readyPlayerInGame(game: string, playerId: string): void {
+        if (this.games[game]) {
+            this.games[game].readyPlayer(playerId);
+        }
+        return;
+    }
+
+    public tryAddPlayerToGame(game: string, playerName?: string): string {
+        let playerId: string = "";
+        if (this.games[game]) {
+            playerId = this.games[game].tryAddPlayer(playerName);
+        }
+        return playerId;
+    }
+
+    /**
+     * TODO
+     */
+    public addSpectatorToGame(game: string): boolean {
+        let success: boolean = false;
+        if (this.games[game]) {
+            success = this.games[game].addSpectator();
+        }
+        return success;
     }
 
     public removePlayerFromGame(game: string, player: string): void {
@@ -92,6 +184,17 @@ export class GameList {
             }
         }
         return;
+    }
+
+    /**
+     * TODO
+     */
+    public removeSpectatorFromGame(game: string): boolean {
+        let success: boolean = false;
+        if (this.games[game]) {
+            success = this.games[game].removeSpectator();
+        }
+        return success;
     }
 
     public gameExists(game: string): boolean {

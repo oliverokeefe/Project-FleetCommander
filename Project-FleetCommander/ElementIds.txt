@@ -1,0 +1,24 @@
+Game (Object)
+--Config
+----GameInput
+----JoinBtn
+--Lobby
+----GameName
+----PlayerInput
+----ReadyBtn
+----Chat
+------ChatLog
+------ChatLogTop
+------ChatInput
+--Game (Div)
+----GameInfo
+------PlayerInfo
+--------PlayerName
+--------PlayerScore
+------TurnCounter
+------Scores
+--------Player1Score
+--------Player2Score
+--------Player3Score
+--------Player4Score
+------GameBoard
