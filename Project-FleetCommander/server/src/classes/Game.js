@@ -82,7 +82,18 @@ class Game {
         return firstAvailable;
     }
     readyPlayer(playerId) {
+        this.players[playerId].setReady(true);
         return;
+    }
+    allPlayersReady() {
+        let ids = Object.keys(this.players);
+        let allReady = true;
+        ids.forEach((id) => {
+            if (!this.players[id].ready) {
+                allReady = false;
+            }
+        });
+        return allReady;
     }
 }
 exports.Game = Game;

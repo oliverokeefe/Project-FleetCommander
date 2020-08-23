@@ -7,13 +7,13 @@ export class Game {
 
     public name: string;
     public playerCount: number;
-    //public players: { [player: string]: Player }
-    public players: {
-        Player1: Player,
-        Player2: Player,
-        Player3: Player,
-        Player4: Player
-    }
+    public players: { [player: string]: Player }
+    //public players: {
+    //    Player1: Player,
+    //    Player2: Player,
+    //    Player3: Player,
+    //    Player4: Player
+    //}
     public chatLog: string[];
     public board: Board;
 
@@ -97,7 +97,6 @@ export class Game {
     }
 
     public getFirstAvailablePlayerSlot(): string {
-
         let ids = Object.keys(this.players);
         let firstAvailable: string = undefined;
         ids.forEach((id) => {
@@ -105,13 +104,23 @@ export class Game {
                 firstAvailable = (firstAvailable) ? firstAvailable : id;
             }
         });
-
         return firstAvailable;
     }
 
     public readyPlayer(playerId): void {
-
+        this.players[playerId].setReady(true);
         return;
+    }
+
+    public allPlayersReady(): boolean {
+        let ids = Object.keys(this.players);
+        let allReady: boolean = true;
+        ids.forEach((id) => {
+            if (!this.players[id].ready) {
+                allReady = false;
+            }
+        });
+        return allReady;
     }
 
 }

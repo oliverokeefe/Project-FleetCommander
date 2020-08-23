@@ -10,6 +10,10 @@ class Player {
         this.ships = [];
         this.ready = false;
     }
+    setReady(readyState) {
+        this.ready = readyState;
+        return;
+    }
 }
 exports.Player = Player;
 //# sourceMappingURL=Player.js.map

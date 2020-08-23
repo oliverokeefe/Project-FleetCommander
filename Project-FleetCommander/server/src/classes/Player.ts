@@ -22,6 +22,10 @@ export class Player {
         this.ready = false;
     }
 
+    public setReady(readyState: boolean): void {
+        this.ready = readyState;
+        return;
+    }
 
 }
 

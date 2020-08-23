@@ -168,7 +168,15 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
 function readyUp(game: string, playerId: string): void {
     if (Games.gameExists(game)) {
         Games.readyPlayerInGame(game, playerId);
-        sendMessage(game, `${playerId} Ready!`)
+        sendMessage(game, `${playerId} Ready!`);
+        console.log(`${playerId} Ready!`);
+
+        //Then check if all players have ready-d
+        if (Games.games[game].allPlayersReady()) {
+            console.log(`${game} START!!!`);
+            sendMessage(game, `### START ###`);
+        }
+            //if so, linku staut
     }
     return;
 }

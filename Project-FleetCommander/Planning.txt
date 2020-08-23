@@ -1,3 +1,6 @@
+
+Things to make
+
 Game (Object)
 +-Config
 *---GameInput
@@ -28,3 +31,5 @@ KEY:
 *: done enough
 =: can ignore for now
 +: section good for now
+
+
