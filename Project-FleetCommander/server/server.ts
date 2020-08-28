@@ -181,6 +181,16 @@ function readyUp(game: string, playerId: string): void {
     return;
 }
 
+function startGame(game: string): void {
+
+    if (Games.gameExists(game)) {
+        Games.startGame(game);
+        io.to(game).emit('start');
+    }
+
+    return;
+}
+
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
