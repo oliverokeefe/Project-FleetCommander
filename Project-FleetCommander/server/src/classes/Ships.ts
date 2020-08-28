@@ -1,6 +1,79 @@
 
 import { coordinate } from '../../../shared/src/types/types';
-import { Board, Tile } from '../../../shared/src/classes/GameBoard';
+import { Board, Tile, Territory } from '../../../shared/src/classes/GameBoard';
+
+
+export class ShipList {
+
+    public ships: {[id: number]: Ship};
+
+    constructor() {
+        this.ships = {};
+    }
+
+    public tryAddShip(ship: Ship): boolean{
+        let success: boolean = false;
+        if(!this.ships[ship.id]){
+            this.ships[ship.id] = ship;
+            success = true;
+        }
+        return success;
+    }
+
+    public removeShip(ship: Ship){
+        delete this.ships[ship.id];
+    }
+
+
+}
+
+export class Fleet {
+
+    ///--------------------------------------------------
+    //These should later be part of a static 'game config' class
+    //  the game config classes can then be used to select different game modes/number of players/ maps/ etc...
+    readonly MAXPAWNS: number;
+    readonly MAXKNIGHTS: number;
+    readonly MAXCOMMAND: number;
+    readonly MAXFLAGSHIPS: number;
+    ///--------------------------------------------------
+
+    public ships: {
+        pawns: {
+            [id: number]: Pawn
+        },
+        knights: {
+            [id: number]: Knight
+        },
+        command: {
+            [id: number]: Command
+        },
+        flagship: {
+            [id: number]: Flagship
+        }
+    };
+
+    constructor(territory: Territory) {
+        this.MAXPAWNS = 5;
+        this.MAXKNIGHTS = 2;
+        this.MAXCOMMAND = 1;
+        this.MAXFLAGSHIPS = 1;
+
+
+
+
+        return;
+    }
+
+    private spawnShipsIntoTerritory(territory: Territory): void{
+        
+        
+
+        return;
+    }
+
+}
+
 
 export abstract class Ship {
 
@@ -8,10 +81,15 @@ export abstract class Ship {
 
 
     public id: number;
+    public player: string;
     public position: Tile;
+    public spawn: Tile
 
-    constructor(id: number) {
+    constructor(id: number, player: string, spawn: Tile) {
         this.id = id;
+        this.player = player;
+        this.spawn = spawn;
+        this.spawnShip();
     }
 
 
@@ -34,6 +112,13 @@ export abstract class Ship {
         } else {
             return false;
         }
+    }
+
+    public spawnShip(): void {
+
+        this.spawn.ships
+
+        return;
     }
 
 }

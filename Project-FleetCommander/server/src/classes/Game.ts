@@ -1,7 +1,14 @@
 import { Player } from "./Player";
 import { Board } from "../../../shared/src/classes/GameBoard";
 
+/**
+ * Send to cliet to update game
+ * 
+ */
+export class GameDelta {
 
+
+}
 
 export class Game {
 
@@ -29,6 +36,30 @@ export class Game {
         }
         this.chatLog = [];
         this.board = new Board();
+    }
+
+    public start(): void {
+        //start the game
+        /*
+        Generate game board
+            -ships will have their player's ID on them
+                -Use this ID to verify all moves
+        
+        Start pawn phase
+            -always verify player moves with the current phase
+        
+        Send client the phase, game object data delta (a.k.a ship location/status), any other data for rendering
+        */
+
+        this.board = new Board();
+
+
+        return;
+    }
+
+    public update(): void {
+
+        return;
     }
 
     public addPlayer(id: string, name?: string): boolean {
@@ -172,6 +203,13 @@ export class GameList {
             playerId = this.games[game].tryAddPlayer(playerName);
         }
         return playerId;
+    }
+
+    public startGame(game: string): void {
+        if(this.games[game]){
+            this.games[game].start();
+        }
+        return;
     }
 
     /**

@@ -1,5 +1,5 @@
 {
-  "name": "project-murder-dome",
+  "name": "project-fleet-commander",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "clean": "tsc --build --clean",
     "start": "node ./server/server"
   },
-  "description": "Project-MurderDome",
+  "description": "Project-FleetCommander",
   "author": {
     "name": "Oliver O'Keefe"
   },
@@ -19,7 +19,6 @@
     "express": "^4.17.1",
     "html": "^1.0.0",
     "path": "^0.12.7",
-    "pug": "^2.0.0-rc.3",
     "socket.io": "^2.3.0",
     "text": "^0.1.0"
   },

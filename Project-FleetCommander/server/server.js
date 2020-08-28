@@ -124,6 +124,13 @@ function readyUp(game, playerId) {
     }
     return;
 }
+function startGame(game) {
+    if (Games.gameExists(game)) {
+        Games.startGame(game);
+        io.to(game).emit('start');
+    }
+    return;
+}
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 io.on('connection', (socket) => {
     console.log('a user connected');

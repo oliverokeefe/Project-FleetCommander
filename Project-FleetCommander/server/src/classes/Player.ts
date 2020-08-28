@@ -1,5 +1,5 @@
 import { Territory } from "../../../shared/src/classes/GameBoard";
-import { Ship } from "./Ships";
+import { Fleet, Ship } from "./Ships";
 
 
 
@@ -9,7 +9,7 @@ export class Player {
     public name: string;
     public score: number;
     public territory: Territory;
-    public ships: Ship[];
+    public fleet: Fleet;
     public ready: boolean;
 
 
@@ -18,7 +18,6 @@ export class Player {
         this.name = (name) ? name: this.id;
         this.score = 0;
         this.territory = undefined;
-        this.ships = [];
         this.ready = false;
     }
 

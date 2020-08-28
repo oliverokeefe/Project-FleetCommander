@@ -1,7 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = void 0;
+exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = exports.Fleet = void 0;
 const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
+class Fleet {
+    constructor(territory) {
+        this.MAXPAWNS = 5;
+        this.MAXKNIGHTS = 2;
+        this.MAXCOMMAND = 1;
+        this.MAXFLAGSHIPS = 1;
+        return;
+    }
+    spawnShipsIntoTerritory(territory) {
+        return;
+    }
+}
+exports.Fleet = Fleet;
 class Ship {
     constructor(id) {
         this.id = id;
@@ -23,6 +36,9 @@ class Ship {
         else {
             return false;
         }
+    }
+    respawn() {
+        return;
     }
 }
 exports.Ship = Ship;

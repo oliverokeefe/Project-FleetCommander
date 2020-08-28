@@ -10,26 +10,22 @@ export class Tile {
     public cluster: number;
 
     public territory: string;
-    public ships: [];
+    public ships: Set<string>;
     public ship: string
     public isSpawn: boolean;
     public canBuildOn: boolean;
 
 
     constructor(coordinate: coordinate, value?: number, cluster?: number) {
-
-        //this.displayDiv = undefined;
-
         this.coordinate = coordinate;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;
 
         this.territory = "";
+        this.ships = new Set<string>();
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
-
-
     }
 
 }
@@ -45,7 +41,6 @@ export class Territory {
     public commandStart: Tile[];
     public flagshipStart: Tile[];
     public buildTiles: Tile[];
-
 
     constructor() {
         this.player = "";

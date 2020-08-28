@@ -7,7 +7,6 @@ class Player {
         this.name = (name) ? name : this.id;
         this.score = 0;
         this.territory = undefined;
-        this.ships = [];
         this.ready = false;
     }
     setReady(readyState) {

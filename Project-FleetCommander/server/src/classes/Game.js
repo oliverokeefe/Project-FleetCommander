@@ -1,8 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameList = exports.Game = void 0;
+exports.GameList = exports.Game = exports.GameDelta = void 0;
 const Player_1 = require("./Player");
 const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
+/**
+ * Send to cliet to update game
+ *
+ */
+class GameDelta {
+}
+exports.GameDelta = GameDelta;
 class Game {
     constructor(name) {
         this.name = name;
@@ -16,6 +23,24 @@ class Game {
         };
         this.chatLog = [];
         this.board = new GameBoard_1.Board();
+    }
+    start() {
+        //start the game
+        /*
+        Generate game board
+            -ships will have their player's ID on them
+                -Use this ID to verify all moves
+        
+        Start pawn phase
+            -always verify player moves with the current phase
+        
+        Send client the phase, game object data delta (a.k.a ship location/status), any other data for rendering
+        */
+        this.board = new GameBoard_1.Board();
+        return;
+    }
+    update() {
+        return;
     }
     addPlayer(id, name) {
         let success = false;
@@ -134,6 +159,12 @@ class GameList {
             playerId = this.games[game].tryAddPlayer(playerName);
         }
         return playerId;
+    }
+    startGame(game) {
+        if (this.games[game]) {
+            this.games[game].start();
+        }
+        return;
     }
     /**
      * TODO
