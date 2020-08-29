@@ -67,7 +67,7 @@ export class Fleet {
 
     private spawnShipsIntoTerritory(territory: Territory): void{
         
-        
+
 
         return;
     }
@@ -82,12 +82,15 @@ export abstract class Ship {
 
     public id: number;
     public player: string;
+    public globalId: string;
     public position: Tile;
     public spawn: Tile
 
     constructor(id: number, player: string, spawn: Tile) {
         this.id = id;
         this.player = player;
+        this.globalId = `${this.player}|${this.id}`;
+        this.position = undefined;
         this.spawn = spawn;
         this.spawnShip();
     }
@@ -115,9 +118,18 @@ export abstract class Ship {
     }
 
     public spawnShip(): void {
+        if(!this.position){
+            this.spawn.ships.add(this.globalId);
+            this.position = this.spawn;
+        }
+        return;
+    }
 
-        this.spawn.ships
-
+    public destroy(): void {
+        if(this.position){
+            this.position.ships.delete(this.globalId);
+            this.position = undefined;
+        }
         return;
     }
 
@@ -129,8 +141,8 @@ export class Pawn extends Ship {
 
     readonly shipClass: string
 
-    constructor(id: number) {
-        super(id);
+    constructor(id: number, player: string, spawn: Tile) {
+        super(id, player, spawn);
         this.shipClass = "pawn";
     }
 
@@ -141,8 +153,8 @@ export class Knight extends Ship {
 
     readonly shipClass;
 
-    constructor(id: number) {
-        super(id);
+    constructor(id: number, player: string, spawn: Tile) {
+        super(id, player, spawn);
         this.shipClass = "knight";
     }
 
@@ -152,8 +164,8 @@ export class Command extends Ship {
 
     readonly shipClass: string;
 
-    constructor(id: number) {
-        super(id);
+    constructor(id: number, player: string, spawn: Tile) {
+        super(id, player, spawn);
         this.shipClass = "command";
     }
 
@@ -163,8 +175,8 @@ export class Flagship extends Ship {
 
     readonly shipClass;
         
-    constructor(id: number) {
-        super(id);
+    constructor(id: number, player: string, spawn: Tile) {
+        super(id, player, spawn);
         this.shipClass = "flagship";
     }
 

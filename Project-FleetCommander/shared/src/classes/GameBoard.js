@@ -7,6 +7,7 @@ class Tile {
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;
         this.territory = "";
+        this.ships = new Set();
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;

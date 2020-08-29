@@ -7,6 +7,7 @@ import { Board } from "../../../shared/src/classes/GameBoard";
  */
 export class GameDelta {
 
+    
 
 }
 

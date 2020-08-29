@@ -1,7 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = exports.Fleet = void 0;
+exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = exports.Fleet = exports.ShipList = void 0;
 const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
+class ShipList {
+    constructor() {
+        this.ships = {};
+    }
+    tryAddShip(ship) {
+        let success = false;
+        if (!this.ships[ship.id]) {
+            this.ships[ship.id] = ship;
+            success = true;
+        }
+        return success;
+    }
+    removeShip(ship) {
+        delete this.ships[ship.id];
+    }
+}
+exports.ShipList = ShipList;
 class Fleet {
     constructor(territory) {
         this.MAXPAWNS = 5;
@@ -16,8 +33,13 @@ class Fleet {
 }
 exports.Fleet = Fleet;
 class Ship {
-    constructor(id) {
+    constructor(id, player, spawn) {
         this.id = id;
+        this.player = player;
+        this.globalId = `${this.player}|${this.id}`;
+        this.position = undefined;
+        this.spawn = spawn;
+        this.spawnShip();
     }
     move(tile) {
         if (this.validMove(tile.coordinate)) {
@@ -37,35 +59,46 @@ class Ship {
             return false;
         }
     }
-    respawn() {
+    spawnShip() {
+        if (!this.position) {
+            this.spawn.ships.add(this.globalId);
+            this.position = this.spawn;
+        }
+        return;
+    }
+    destroy() {
+        if (this.position) {
+            this.position.ships.delete(this.globalId);
+            this.position = undefined;
+        }
         return;
     }
 }
 exports.Ship = Ship;
 class Pawn extends Ship {
-    constructor(id) {
-        super(id);
+    constructor(id, player, spawn) {
+        super(id, player, spawn);
         this.shipClass = "pawn";
     }
 }
 exports.Pawn = Pawn;
 class Knight extends Ship {
-    constructor(id) {
-        super(id);
+    constructor(id, player, spawn) {
+        super(id, player, spawn);
         this.shipClass = "knight";
     }
 }
 exports.Knight = Knight;
 class Command extends Ship {
-    constructor(id) {
-        super(id);
+    constructor(id, player, spawn) {
+        super(id, player, spawn);
         this.shipClass = "command";
     }
 }
 exports.Command = Command;
 class Flagship extends Ship {
-    constructor(id) {
-        super(id);
+    constructor(id, player, spawn) {
+        super(id, player, spawn);
         this.shipClass = "flagship";
     }
 }
