@@ -1,4 +1,4 @@
-import { Board } from "../../../shared/src/classes/GameBoard";
+import { Board } from "./GameBoard.js";
 /*
  * Keep track of Game
  *

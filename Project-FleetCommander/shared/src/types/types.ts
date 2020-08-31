@@ -1,5 +1,3 @@
-import { Tile } from "../classes/GameBoard";
-
 
 export type comparator = (a: any, b: any) => boolean;
 export type actionKey = "attack" | "hide" | "move" | "search" | "rest" | "wait";
@@ -20,6 +18,5 @@ export type game = {
 };
 export type playerList = { [player: string]: string };
 export type coordinate = [number, number];
-export type board = Array<Array<Tile>>;
 
 

@@ -1,6 +1,6 @@
 
-import { coordinate } from '../../../shared/src/types/types';
-import { Board, Tile } from '../../../shared/src/classes/GameBoard';
+import type { coordinate } from '../../../shared/src/types/types';
+import { Board, Tile } from './GameBoard.js';
 
 
 //***** Client ships

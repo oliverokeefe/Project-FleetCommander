@@ -1,3 +1,6 @@
+///--------------------------------------------------
+// TODO Make a seperate server and client game board... this cannot be in shared...
+///--------------------------------------------------
 export class Tile {
     constructor(coordinate, value, cluster) {
         this.coordinate = coordinate;

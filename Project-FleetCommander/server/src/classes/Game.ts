@@ -1,5 +1,5 @@
 import { Player } from "./Player";
-import { Board } from "../../../shared/src/classes/GameBoard";
+import { Board } from "./GameBoard";
 
 /**
  * Send to cliet to update game
@@ -71,7 +71,7 @@ export class Game {
             this.board.territories.forEach((territory) => {
                 if (!territory.player || !this.players[id].territory) {
                     territory.player = this.players[id].id;
-                    this.players[id].territory = territory;
+                    this.players[id].setTerritory(territory);
                 }
             });
             success = true;
@@ -108,7 +108,7 @@ export class Game {
             this.board.territories.forEach((territory) => {
                 if (territory.player === this.players[playerId].id) {
                     territory.player = "";
-                    this.players[playerId].territory = undefined;
+                    this.players[playerId].clear();
                 }
             });
             this.players[playerId] = undefined;

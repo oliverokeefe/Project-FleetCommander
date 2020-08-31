@@ -1,8 +1,9 @@
 
-import type { joinData, game, board, coordinate } from '../../../shared/src/types/types';
-import { Board, Territory, Tile } from '../../../shared/src/classes/GameBoard.js';
+import type { joinData, game, coordinate } from '../../../shared/src/types/types';
 import { GameModel } from '../classes/GameModel.js';
 import { PlayerModel } from '../classes/PlayerModel.js';
+
+
 
 let socket: SocketIOClient.Socket = undefined;
 
@@ -11,7 +12,6 @@ let Player: PlayerModel = undefined;
 
 let gameBoardDiv: HTMLDivElement = undefined;
 let gameBoardDisplay: HTMLDivElement[][] = [];
-let gameBoard: board = [];
 
 
 let gameNameDisplay: HTMLDivElement = undefined;
@@ -78,12 +78,11 @@ function getMessage(message: string): void {
     return;
 }
 
-function joinGame(game: string, player: string, chatlog: string[], board: board): void {
+function joinGame(game: string, player: string, chatlog: string[]): void {
     clearGame();
     updateChat(chatlog);
     updateGameInfo(game);
     updatePlayerInfo(player);
-    updateBoard(board);
     return;
 }
 
@@ -101,33 +100,6 @@ function chatInputHandler(event: KeyboardEvent): void {
 }
 
 
-
-function updateBoard(board: board): void {
-
-    gameBoard = board;
-
-    gameBoard.forEach((tiles: Tile[], row) => {
-        tiles.forEach((tile: Tile, col) => {
-
-            //tile has the info to display
-            //gameBoardDisplay[row][col] is where to display the information
-
-
-        });
-    });
-
-    //loop through gameBoard and render each tile
-        //Add ships or remove ships as necessary
-
-    return;
-}
-
-
-
-
-
-
-
 function createBlankBoard(): void {
 
     for (let row = 0; row < 11; row++) {
@@ -136,7 +108,6 @@ function createBlankBoard(): void {
 
     gameBoardDiv.classList.remove("nodisp");
 
-    console.log(gameBoard);
     console.log(gameBoardDisplay);
 
     return;
@@ -148,7 +119,6 @@ function createRow(row: number): HTMLDivElement {
     let oddeven = (row % 2 === 0) ? "even" : "odd";
     rowDiv.classList.add("row", `r${row}`, oddeven);
 
-    gameBoard.push([]);
     gameBoardDisplay.push([]);
 
     for (let col = 0; col < 11; col++) {
@@ -165,7 +135,6 @@ function createTile(row: number, col: number): HTMLDivElement {
     tile.classList.add("tile", `c${col}`, oddeven);
     tile.id = `r${row}c${col}`;
 
-    gameBoard[row].push(new Tile([row,col]));
     gameBoardDisplay[row].push(tile);
 
     return tile;

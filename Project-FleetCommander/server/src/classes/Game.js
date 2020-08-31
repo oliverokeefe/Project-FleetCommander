@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameList = exports.Game = exports.GameDelta = void 0;
 const Player_1 = require("./Player");
-const GameBoard_1 = require("../../../shared/src/classes/GameBoard");
+const GameBoard_1 = require("./GameBoard");
 /**
  * Send to cliet to update game
  *
@@ -50,7 +50,7 @@ class Game {
             this.board.territories.forEach((territory) => {
                 if (!territory.player || !this.players[id].territory) {
                     territory.player = this.players[id].id;
-                    this.players[id].territory = territory;
+                    this.players[id].setTerritory(territory);
                 }
             });
             success = true;
@@ -80,7 +80,7 @@ class Game {
             this.board.territories.forEach((territory) => {
                 if (territory.player === this.players[playerId].id) {
                     territory.player = "";
-                    this.players[playerId].territory = undefined;
+                    this.players[playerId].clear();
                 }
             });
             this.players[playerId] = undefined;

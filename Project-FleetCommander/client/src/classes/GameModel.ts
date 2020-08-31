@@ -1,5 +1,5 @@
-import { PlayerModel } from "./PlayerModel";
-import { Board } from "../../../shared/src/classes/GameBoard";
+import { PlayerModel } from "./PlayerModel.js";
+import { Board } from "./GameBoard.js";
 
 
 /*

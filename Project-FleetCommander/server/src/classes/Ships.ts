@@ -1,6 +1,7 @@
 
 import { coordinate } from '../../../shared/src/types/types';
-import { Board, Tile, Territory } from '../../../shared/src/classes/GameBoard';
+import { Board, Tile, Territory } from './GameBoard';
+import { Player } from './Player';
 
 
 export class ShipList {
@@ -23,8 +24,6 @@ export class ShipList {
     public removeShip(ship: Ship){
         delete this.ships[ship.id];
     }
-
-
 }
 
 export class Fleet {
@@ -58,16 +57,46 @@ export class Fleet {
         this.MAXKNIGHTS = 2;
         this.MAXCOMMAND = 1;
         this.MAXFLAGSHIPS = 1;
-
-
-
-
+        this.spawnShipsIntoTerritory(territory);
         return;
     }
 
     private spawnShipsIntoTerritory(territory: Territory): void{
-        
+        if(territory.player){
+            territory.pawnStart.forEach((spawnTile: Tile, index: number) => {
+                if(index < this.MAXPAWNS){
+                    this.ships.pawns[index] = new Pawn(index, territory.player, spawnTile);
+                }
+            });
+            territory.knightStart.forEach((spawnTile: Tile, index: number) => {
+                if(index < this.MAXKNIGHTS){
+                    this.ships.knights[index] = new Knight(index, territory.player, spawnTile);
+                }
+            });
+            territory.commandStart.forEach((spawnTile: Tile, index: number) => {
+                if(index < this.MAXCOMMAND){
+                    this.ships.command[index] = new Command(index, territory.player, spawnTile);
+                }
+            });
+            territory.flagshipStart.forEach((spawnTile: Tile, index: number) => {
+                if(index < this.MAXFLAGSHIPS){
+                    this.ships.flagship[index] = new Flagship(index, territory.player, spawnTile);
+                }
+            });
+        }
+        return;
+    }
 
+    public clear(): void {
+
+        Object.keys(this.ships).forEach((shipClass) => {
+            Object.keys(this.ships[shipClass]).forEach((ship) => {
+                if(this.ships[shipClass][ship]){
+                    (this.ships[shipClass][ship] as Ship).destroy();
+                }
+                this.ships[shipClass][ship] = undefined
+            });
+        });
 
         return;
     }
@@ -85,22 +114,37 @@ export abstract class Ship {
     public globalId: string;
     public position: Tile;
     public spawn: Tile
+    public value: number
 
     constructor(id: number, player: string, spawn: Tile) {
         this.id = id;
         this.player = player;
-        this.globalId = `${this.player}|${this.id}`;
+        this.globalId = `${this.player}:${this.id}`;
         this.position = undefined;
         this.spawn = spawn;
+        this.value = 1;
         this.spawnShip();
+    }
+
+    private putShipOnTile(tile: Tile): void {
+        tile.ships.add(this.globalId);
+        this.position = tile;
+        return;
+    }
+
+    private removeShipFromBoard(): void {
+        if(this.position){
+            this.position.ships.delete(this.globalId);
+            this.position = undefined;
+        }
+        return;
     }
 
 
     public move(tile: Tile): Tile {
         if (this.validMove(tile.coordinate)) {
-            this.position = tile;
+            this.putShipOnTile(tile);
         }
-
         return this.position;
     }
 
@@ -119,17 +163,23 @@ export abstract class Ship {
 
     public spawnShip(): void {
         if(!this.position){
-            this.spawn.ships.add(this.globalId);
-            this.position = this.spawn;
+            this.putShipOnTile(this.spawn);
         }
         return;
     }
 
-    public destroy(): void {
-        if(this.position){
-            this.position.ships.delete(this.globalId);
-            this.position = undefined;
+    public destroy(player?: Player): void {
+        if(player){
+            player.score += this.value;
         }
+        this.removeShipFromBoard();
+        return;
+    }
+
+    /**
+     * TODO
+     */
+    public tryCollectResource(): void {
         return;
     }
 
@@ -151,10 +201,11 @@ export class Pawn extends Ship {
 
 export class Knight extends Ship {
 
-    readonly shipClass;
+    readonly shipClass: string;
 
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
+        this.value = 2;
         this.shipClass = "knight";
     }
 
@@ -166,6 +217,7 @@ export class Command extends Ship {
 
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
+        this.value = 3;
         this.shipClass = "command";
     }
 
@@ -173,10 +225,11 @@ export class Command extends Ship {
 
 export class Flagship extends Ship {
 
-    readonly shipClass;
+    readonly shipClass: string;
         
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
+        this.value = 5;
         this.shipClass = "flagship";
     }
 

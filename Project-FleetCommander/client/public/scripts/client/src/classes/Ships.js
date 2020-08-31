@@ -1,4 +1,4 @@
-import { Board } from '../../../shared/src/classes/GameBoard';
+import { Board } from './GameBoard.js';
 //***** Client ships
 /*
  * Client side ship data
