@@ -187,7 +187,9 @@ export class Game {
         let ids = Object.keys(this.players);
         let allReady: boolean = true;
         ids.forEach((id) => {
-            if (!this.players[id].ready) {
+            if (this.players[id] && !this.players[id].ready) {
+                allReady = false;
+            } else if(!this.players[id]) {
                 allReady = false;
             }
         });

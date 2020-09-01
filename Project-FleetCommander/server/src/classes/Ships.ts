@@ -57,6 +57,14 @@ export class Fleet {
         this.MAXKNIGHTS = 2;
         this.MAXCOMMAND = 1;
         this.MAXFLAGSHIPS = 1;
+
+        this.ships = {
+            pawn: {},
+            knight: {},
+            command: {},
+            flagship: {}
+        };
+
         this.spawnShipsIntoTerritory(territory);
         return;
     }

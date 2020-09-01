@@ -1,10 +1,10 @@
 
 
 import { Scoreboard } from './Scoreboard.js' 
-import { Board } from './GameBoard.js';
+import { Board } from './Gameboard.js';
 import { Player } from './Player.js';
 import * as Ship from './Ships.js'
-import * as Delta from '../../../shared/src/classes/GameDelta';
+import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 export class Game {
 
@@ -17,6 +17,8 @@ export class Game {
     constructor(socket: SocketIOClient.Socket) {
         this.socket = socket;
         this.displayElement = document.getElementById("Game") as HTMLDivElement;
+
+        this.Board = new Board(socket);
 
 
         this.setUpSocket();
@@ -45,6 +47,8 @@ export class Game {
         //Create **and spawn** the ships listed
 
         //Reveal all of it (remove any/all nodisp classes)
+        this.displayElement.classList.remove("nodisp");
+        console.log(data);
         return;
     }
 

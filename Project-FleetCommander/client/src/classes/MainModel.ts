@@ -20,7 +20,7 @@ export class MainModel {
 
         this.ConfigSectionModel = new ConfigSection(this.socket);
         this.LobbyModel = new Lobby(this.socket);
-        //this.GameModel = new GameModel();
+        this.Game = new Game(this.socket);
 
 
     }

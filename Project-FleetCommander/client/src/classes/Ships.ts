@@ -1,6 +1,8 @@
 
 import type { coordinate } from '../../../shared/src/types/types';
 import { Board, Tile } from './GameBoard.js';
+import * as Delta from '../../../shared/src/classes/GameDelta.js';
+
 
 
 //***** Client ships

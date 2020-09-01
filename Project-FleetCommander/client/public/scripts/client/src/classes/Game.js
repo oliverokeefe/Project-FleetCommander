@@ -1,7 +1,9 @@
+import { Board } from './Gameboard.js';
 export class Game {
     constructor(socket) {
         this.socket = socket;
         this.displayElement = document.getElementById("Game");
+        this.Board = new Board(socket);
         this.setUpSocket();
         this.addHanldersToElements();
     }
@@ -23,6 +25,8 @@ export class Game {
         //Set the initial move phase
         //Create **and spawn** the ships listed
         //Reveal all of it (remove any/all nodisp classes)
+        this.displayElement.classList.remove("nodisp");
+        console.log(data);
         return;
     }
     update(data) {
