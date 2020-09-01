@@ -18,13 +18,18 @@ export class Lobby {
         this.ReadyBtnElement = document.getElementById("ReadyBtn") as HTMLButtonElement;
         this.Chat = new Chat(socket);
 
-        this.ReadyBtnElement.addEventListener("click", () => { this.readyBtnHandler() });
 
         this.setUpSocket();
+        this.addHandlersToElements();
     }
 
     private setUpSocket(): void {
         this.socket.on('joinLobby', (game: string) => { this.joinLobby(game) });
+        return;
+    }
+
+    private addHandlersToElements(): void {
+        this.ReadyBtnElement.addEventListener("click", () => { this.readyBtnHandler() });
         return;
     }
 

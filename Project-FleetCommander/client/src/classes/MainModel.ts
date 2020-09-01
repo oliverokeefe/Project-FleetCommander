@@ -1,6 +1,6 @@
 import { ConfigSection } from "./ConfigSection.js";
 import { Lobby } from "./Lobby.js";
-import { GameModel } from "./GameModel.js";
+import { Game } from "./Game.js";
 
 
 /**
@@ -11,7 +11,7 @@ export class MainModel {
     public socket: SocketIOClient.Socket;
     public ConfigSectionModel: ConfigSection;
     public LobbyModel: Lobby;
-    public GameModel: GameModel;
+    public Game: Game;
 
 
     constructor() {

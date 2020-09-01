@@ -38,10 +38,10 @@ export class Fleet {
     ///--------------------------------------------------
 
     public ships: {
-        pawns: {
+        pawn: {
             [id: number]: Pawn
         },
-        knights: {
+        knight: {
             [id: number]: Knight
         },
         command: {
@@ -65,12 +65,12 @@ export class Fleet {
         if(territory.player){
             territory.pawnStart.forEach((spawnTile: Tile, index: number) => {
                 if(index < this.MAXPAWNS){
-                    this.ships.pawns[index] = new Pawn(index, territory.player, spawnTile);
+                    this.ships.pawn[index] = new Pawn(index, territory.player, spawnTile);
                 }
             });
             territory.knightStart.forEach((spawnTile: Tile, index: number) => {
                 if(index < this.MAXKNIGHTS){
-                    this.ships.knights[index] = new Knight(index, territory.player, spawnTile);
+                    this.ships.knight[index] = new Knight(index, territory.player, spawnTile);
                 }
             });
             territory.commandStart.forEach((spawnTile: Tile, index: number) => {

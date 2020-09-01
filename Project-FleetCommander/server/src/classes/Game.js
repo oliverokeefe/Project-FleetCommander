@@ -24,20 +24,52 @@ class Game {
         this.chatLog = [];
         this.board = new GameBoard_1.Board();
     }
+    /**
+     * Still needs error checking.... Like the rest of the code..
+     *
+     */
     start() {
-        //start the game
-        /*
-        Generate game board
-            -ships will have their player's ID on them
-                -Use this ID to verify all moves
-        
-        Start pawn phase
-            -always verify player moves with the current phase
-        
-        Send client the phase, game object data delta (a.k.a ship location/status), any other data for rendering
-        */
-        this.board = new GameBoard_1.Board();
-        return;
+        let startGameData = {
+            ships: [],
+            scores: [],
+            movePhase: "",
+            board: "" //Currently unimplemented
+        };
+        startGameData.ships = this.initialShips();
+        startGameData.scores = this.initialScores();
+        startGameData.movePhase = this.initialMovePhase();
+        return startGameData;
+    }
+    initialShips() {
+        let initialShips = [];
+        //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
+        //Then the const static data could be used here instead of constantly doing Object.keys()
+        Object.keys(this.players).forEach((playerId) => {
+            Object.keys(this.players[playerId].fleet.ships).forEach((shipClass) => {
+                Object.keys(this.players[playerId].fleet.ships[shipClass]).forEach((shipId) => {
+                    initialShips.push({
+                        playerId: playerId,
+                        shipId: shipId,
+                        shipClass: shipClass,
+                        startLocation: this.players[playerId].fleet.ships[shipClass][shipId].position.coordinate
+                    });
+                });
+            });
+        });
+        return initialShips;
+    }
+    initialScores() {
+        let initialScores = [];
+        Object.keys(this.players).forEach((playerId) => {
+            initialScores.push({
+                playerId: playerId,
+                score: 0
+            });
+        });
+        return initialScores;
+    }
+    initialMovePhase() {
+        return "pawn";
     }
     update() {
         return;
@@ -161,10 +193,11 @@ class GameList {
         return playerId;
     }
     startGame(game) {
+        let startGameData = undefined;
         if (this.games[game]) {
-            this.games[game].start();
+            startGameData = this.games[game].start();
         }
-        return;
+        return startGameData;
     }
     /**
      * TODO

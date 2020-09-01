@@ -2,7 +2,6 @@
 export class ConfigSection {
 
     public socket: SocketIOClient.Socket;
-
     public displayElememt: HTMLDivElement;
     public GameInputElement: HTMLInputElement;
     public JoinBtnElement: HTMLButtonElement;
@@ -13,18 +12,16 @@ export class ConfigSection {
         this.GameInputElement = document.getElementById("GameInput") as HTMLInputElement;
         this.JoinBtnElement = document.getElementById("JoinBtn") as HTMLButtonElement;
 
-        this.configSocket();
+        this.setUpSocket();
         this.addHandlersToElements();
     }
 
-    private configSocket(): void {
-
+    private setUpSocket(): void {
         return;
     }
 
     private addHandlersToElements(): void {
         this.JoinBtnElement.addEventListener("click", () => { this.joinBtnHandler() });
-
         return;
     }
 

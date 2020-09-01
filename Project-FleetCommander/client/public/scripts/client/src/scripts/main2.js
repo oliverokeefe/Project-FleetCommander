@@ -1,6 +1,4 @@
 let socket = undefined;
-let Game = undefined;
-let Player = undefined;
 let gameBoardDiv = undefined;
 let gameBoardDisplay = [];
 let gameNameDisplay = undefined;

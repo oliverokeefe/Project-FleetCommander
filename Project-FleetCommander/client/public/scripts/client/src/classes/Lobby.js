@@ -7,11 +7,15 @@ export class Lobby {
         this.PlayerInputElement = document.getElementById("PlayerInput");
         this.ReadyBtnElement = document.getElementById("ReadyBtn");
         this.Chat = new Chat(socket);
-        this.ReadyBtnElement.addEventListener("click", () => { this.readyBtnHandler(); });
         this.setUpSocket();
+        this.addHandlersToElements();
     }
     setUpSocket() {
         this.socket.on('joinLobby', (game) => { this.joinLobby(game); });
+        return;
+    }
+    addHandlersToElements() {
+        this.ReadyBtnElement.addEventListener("click", () => { this.readyBtnHandler(); });
         return;
     }
     joinLobby(game) {

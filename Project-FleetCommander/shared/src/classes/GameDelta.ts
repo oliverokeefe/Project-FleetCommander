@@ -1,5 +1,11 @@
 import { coordinate } from "../types/types";
 
+export interface ShipData {
+    playerId: string;
+    shipId: string;
+    shipClass: string;
+    startLocation: coordinate;
+}
 
 export interface SpawnDelta {
     playerId: string;
@@ -37,6 +43,12 @@ export interface ToClientDelta {
     movePhase: string;
 }
 
+export interface InitialGameState {
+    ships: ShipData[];
+    scores: ScoreDelta[];
+    movePhase: string;
+    board: string; // Currently unimplemented
+}
 
 
 

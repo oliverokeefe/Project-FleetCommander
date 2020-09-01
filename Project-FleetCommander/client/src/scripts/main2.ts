@@ -1,14 +1,10 @@
 
 import type { joinData, game, coordinate } from '../../../shared/src/types/types';
-import { GameModel } from '../classes/GameModel.js';
-import { PlayerModel } from '../classes/PlayerModel.js';
 
 
 
 let socket: SocketIOClient.Socket = undefined;
 
-let Game: GameModel = undefined;
-let Player: PlayerModel = undefined;
 
 let gameBoardDiv: HTMLDivElement = undefined;
 let gameBoardDisplay: HTMLDivElement[][] = [];

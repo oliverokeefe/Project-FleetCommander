@@ -3,6 +3,7 @@ import express = require('express');
 import path = require('path');
 
 import { joinData, gameList } from '../shared/src/types/types';
+import * as Delta from '../shared/src/classes/GameDelta';
 import { Server } from 'socket.io';
 import { Game, GameList } from './src/classes/Game';
 
@@ -171,10 +172,9 @@ function readyUp(game: string, playerId: string): void {
 
         //Then check if all players have ready-d
         if (Games.games[game].allPlayersReady()) {
-            console.log(`${game} START!!!`);
             sendMessage(game, `### START ###`);
+            startGame(game);
         }
-            //if so, linku staut
     }
     return;
 }
@@ -182,8 +182,8 @@ function readyUp(game: string, playerId: string): void {
 function startGame(game: string): void {
 
     if (Games.gameExists(game)) {
-        Games.startGame(game);
-        io.to(game).emit('start');
+        let startGameData: Delta.InitialGameState = Games.startGame(game);
+        io.to(game).emit('start', startGameData);
     }
 
     return;

@@ -117,17 +117,16 @@ function readyUp(game, playerId) {
         console.log(`${playerId} Ready!`);
         //Then check if all players have ready-d
         if (Games.games[game].allPlayersReady()) {
-            console.log(`${game} START!!!`);
             sendMessage(game, `### START ###`);
+            startGame(game);
         }
-        //if so, linku staut
     }
     return;
 }
 function startGame(game) {
     if (Games.gameExists(game)) {
-        Games.startGame(game);
-        io.to(game).emit('start');
+        let startGameData = Games.startGame(game);
+        io.to(game).emit('start', startGameData);
     }
     return;
 }

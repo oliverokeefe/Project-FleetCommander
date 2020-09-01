@@ -1,28 +1,10 @@
-import { Board } from "./GameBoard.js";
-/*
- * Keep track of Game
- *
- * nice methods for connecting to, setting up and cleaning up game
- *
- * RECEIVES turn updates from server
- *
- */
+//Board
+//Player
+//Ship
+//Scoreboard
+//Delta
 export class GameModel {
-    //DisplayDivs
-    //Game
-    //Board
-    //Hud (points, build menu, turn counter, etc...)
-    //Chat
-    //****
-    //Need to generate these, as well as have the handlers to keep them updated.
-    //(maybe make them each their own 'control' subclass with an abstract 'control' class)
-    //****
-    constructor(gameDiv) {
-        this.name = "";
-        this.player = undefined;
-        this.chatLog = [];
-        this.board = new Board();
-        this.display = gameDiv;
+    constructor(socket) {
     }
     /**
      *

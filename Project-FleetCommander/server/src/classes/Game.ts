@@ -1,5 +1,7 @@
 import { Player } from "./Player";
 import { Board } from "./GameBoard";
+import * as Delta from '../../../shared/src/classes/GameDelta';
+import { Ship } from "./Ships";
 
 /**
  * Send to cliet to update game
@@ -39,23 +41,60 @@ export class Game {
         this.board = new Board();
     }
 
-    public start(): void {
-        //start the game
-        /*
-        Generate game board
-            -ships will have their player's ID on them
-                -Use this ID to verify all moves
-        
-        Start pawn phase
-            -always verify player moves with the current phase
-        
-        Send client the phase, game object data delta (a.k.a ship location/status), any other data for rendering
-        */
+    /**
+     * Still needs error checking.... Like the rest of the code..
+     * 
+     */
+    public start(): Delta.InitialGameState {
 
-        this.board = new Board();
+        let startGameData: Delta.InitialGameState = {
+            ships: [],
+            scores: [],
+            movePhase: "",
+            board: "" //Currently unimplemented
+        };
+
+        startGameData.ships = this.initialShips();
+        startGameData.scores = this.initialScores();
+        startGameData.movePhase = this.initialMovePhase();
 
 
-        return;
+        return startGameData;
+    }
+
+    private initialShips(): Delta.ShipData[] {
+        let initialShips: Delta.ShipData[] = [];
+        //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
+        //Then the const static data could be used here instead of constantly doing Object.keys()
+        Object.keys(this.players).forEach((playerId) => {
+            Object.keys(this.players[playerId].fleet.ships).forEach((shipClass) => {
+                Object.keys(this.players[playerId].fleet.ships[shipClass]).forEach((shipId) => {
+                    initialShips.push({
+                        playerId: playerId,
+                        shipId: shipId,
+                        shipClass: shipClass,
+                        startLocation: (this.players[playerId].fleet.ships[shipClass][shipId] as Ship).position.coordinate
+                    });
+                });
+            });
+        });
+
+        return initialShips;
+    }
+
+    private initialScores(): Delta.ScoreDelta[] {
+        let initialScores: Delta.ScoreDelta[] = [];
+        Object.keys(this.players).forEach((playerId: string) => {
+            initialScores.push({
+                playerId: playerId,
+                score: 0
+            });
+        });
+        return initialScores;
+    }
+
+    private initialMovePhase(): string {
+        return "pawn";
     }
 
     public update(): void {
@@ -206,11 +245,12 @@ export class GameList {
         return playerId;
     }
 
-    public startGame(game: string): void {
+    public startGame(game: string): Delta.InitialGameState {
+        let startGameData: Delta.InitialGameState = undefined;
         if(this.games[game]){
-            this.games[game].start();
+            startGameData = this.games[game].start();
         }
-        return;
+        return startGameData;
     }
 
     /**

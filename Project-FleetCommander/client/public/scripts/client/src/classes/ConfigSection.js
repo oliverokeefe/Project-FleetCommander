@@ -4,10 +4,10 @@ export class ConfigSection {
         this.displayElememt = document.getElementById("Config");
         this.GameInputElement = document.getElementById("GameInput");
         this.JoinBtnElement = document.getElementById("JoinBtn");
-        this.configSocket();
+        this.setUpSocket();
         this.addHandlersToElements();
     }
-    configSocket() {
+    setUpSocket() {
         return;
     }
     addHandlersToElements() {
