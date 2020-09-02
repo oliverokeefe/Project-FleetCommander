@@ -1,4 +1,5 @@
 import { coordinate } from "../../../shared/src/types/types";
+import { stringify } from "querystring";
 
 type board = Array<Array<Tile>>;
 ///--------------------------------------------------
@@ -65,7 +66,7 @@ export class Board {
 
     public board: board;
 
-    public territories: Territory[];
+    public territories: Map<string, Territory>;
 
     constructor() {
         this.board = undefined;
@@ -220,7 +221,7 @@ export class Board {
 
     private createTerritories(): void {
 
-        this.territories = [];
+        this.territories = new Map<string, Territory>();
 
         //Top Left
         let topLeft: Territory = new Territory();
@@ -247,14 +248,17 @@ export class Board {
         botRight.buildTiles = botRight.pawnStart.concat(botRight.knightStart, botRight.commandStart, botRight.flagshipStart);
 
         //Bottom Left
-        let BotLeft: Territory = new Territory();
-        BotLeft.pawnStart = [this.board[8][0], this.board[8][1], this.board[8][2], this.board[9][2], this.board[10][2]];
-        BotLeft.knightStart = [this.board[9][0], this.board[10][1]];
-        BotLeft.commandStart = [this.board[9][1]];
-        BotLeft.flagshipStart = [this.board[10][0]];
-        BotLeft.buildTiles = BotLeft.pawnStart.concat(BotLeft.knightStart, BotLeft.commandStart, BotLeft.flagshipStart);
+        let botLeft: Territory = new Territory();
+        botLeft.pawnStart = [this.board[8][0], this.board[8][1], this.board[8][2], this.board[9][2], this.board[10][2]];
+        botLeft.knightStart = [this.board[9][0], this.board[10][1]];
+        botLeft.commandStart = [this.board[9][1]];
+        botLeft.flagshipStart = [this.board[10][0]];
+        botLeft.buildTiles = botLeft.pawnStart.concat(botLeft.knightStart, botLeft.commandStart, botLeft.flagshipStart);
 
-        this.territories.push(topLeft, topRight, botRight, BotLeft);
+        this.territories.set("topLeft", topLeft);
+        this.territories.set("topRight", topRight);
+        this.territories.set("botRight", botRight);
+        this.territories.set("botLeft", botLeft);
 
         return;
     }

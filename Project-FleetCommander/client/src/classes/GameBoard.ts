@@ -1,4 +1,5 @@
 import { coordinate } from "../../../shared/src/types/types";
+import { Ship } from "./Ships.js";
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 
@@ -14,11 +15,13 @@ export class Tile {
     public socket: SocketIOClient.Socket;
     public displayElement: HTMLDivElement;
     public coordinate: coordinate
+    public ships: Set<string>;
 
     constructor(socket: SocketIOClient.Socket, display: HTMLDivElement, coordinate: coordinate) {
         this.socket = socket;
         this.displayElement = display;
         this.coordinate = coordinate;
+        this.ships = new Set<string>();
 
         this.setUpSocket();
         this.addHanldersToElements();
@@ -42,11 +45,13 @@ export class Board {
     public socket: SocketIOClient.Socket;
     public displayElement: HTMLDivElement;
     public tiles: Tile[][];
+    public ships: Map<string, Ship>;
 
     constructor(socket: SocketIOClient.Socket) {
         this.socket = socket;
         this.displayElement = document.getElementById("Gameboard") as HTMLDivElement;
         this.tiles = [];
+        this.ships = new Map<string, Ship>();
 
         this.setUpSocket();
         this.addHanldersToElements();

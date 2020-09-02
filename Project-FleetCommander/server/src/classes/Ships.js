@@ -82,7 +82,8 @@ class Ship {
         this.value = 1;
         this.spawnShip();
     }
-    putShipOnTile(tile) {
+    placeShipOnTile(tile) {
+        this.removeShipFromBoard();
         tile.ships.add(this.globalId);
         this.position = tile;
         return;
@@ -96,7 +97,7 @@ class Ship {
     }
     move(tile) {
         if (this.validMove(tile.coordinate)) {
-            this.putShipOnTile(tile);
+            this.placeShipOnTile(tile);
         }
         return this.position;
     }
@@ -113,9 +114,7 @@ class Ship {
         }
     }
     spawnShip() {
-        if (!this.position) {
-            this.putShipOnTile(this.spawn);
-        }
+        this.placeShipOnTile(this.spawn);
         return;
     }
     destroy(player) {

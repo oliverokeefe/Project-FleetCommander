@@ -134,7 +134,8 @@ export abstract class Ship {
         this.spawnShip();
     }
 
-    private putShipOnTile(tile: Tile): void {
+    private placeShipOnTile(tile: Tile): void {
+        this.removeShipFromBoard();
         tile.ships.add(this.globalId);
         this.position = tile;
         return;
@@ -151,7 +152,7 @@ export abstract class Ship {
 
     public move(tile: Tile): Tile {
         if (this.validMove(tile.coordinate)) {
-            this.putShipOnTile(tile);
+            this.placeShipOnTile(tile);
         }
         return this.position;
     }
@@ -170,9 +171,7 @@ export abstract class Ship {
     }
 
     public spawnShip(): void {
-        if(!this.position){
-            this.putShipOnTile(this.spawn);
-        }
+        this.placeShipOnTile(this.spawn);
         return;
     }
 

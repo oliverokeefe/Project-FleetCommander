@@ -78,13 +78,30 @@ class Game {
         let success = false;
         if (this.players.hasOwnProperty(id) && !this.players[id]) {
             this.players[id] = new Player_1.Player(id, name);
-            this.playerCount++;
-            this.board.territories.forEach((territory) => {
-                if (!territory.player || !this.players[id].territory) {
-                    territory.player = this.players[id].id;
-                    this.players[id].setTerritory(territory);
+            let territoryKey = "";
+            switch (id) {
+                case ("Player1"): {
+                    territoryKey = "topLeft";
+                    break;
                 }
-            });
+                case ("Player2"): {
+                    territoryKey = "topRight";
+                    break;
+                }
+                case ("Player3"): {
+                    territoryKey = "botRight";
+                    break;
+                }
+                case ("Player4"): {
+                    territoryKey = "botLeft";
+                    break;
+                }
+            }
+            if (!this.board.territories.get(territoryKey).player || !this.players[id].territory) {
+                this.board.territories.get(territoryKey).player = this.players[id].id;
+                this.players[id].setTerritory(this.board.territories.get(territoryKey));
+            }
+            this.playerCount++;
             success = true;
         }
         return success;
@@ -109,12 +126,27 @@ class Game {
     removePlayer(playerId) {
         let success = false;
         if (this.players[playerId]) {
-            this.board.territories.forEach((territory) => {
-                if (territory.player === this.players[playerId].id) {
-                    territory.player = "";
-                    this.players[playerId].clear();
+            let territoryKey = "";
+            switch (playerId) {
+                case ("Player1"): {
+                    territoryKey = "topLeft";
+                    break;
                 }
-            });
+                case ("Player2"): {
+                    territoryKey = "topRight";
+                    break;
+                }
+                case ("Player3"): {
+                    territoryKey = "botRight";
+                    break;
+                }
+                case ("Player4"): {
+                    territoryKey = "botLeft";
+                    break;
+                }
+            }
+            this.board.territories.get(territoryKey).player = "";
+            this.players[playerId].clear();
             this.players[playerId] = undefined;
             this.playerCount--;
             success = true;

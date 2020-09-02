@@ -179,7 +179,7 @@ class Board {
         return;
     }
     createTerritories() {
-        this.territories = [];
+        this.territories = new Map();
         //Top Left
         let topLeft = new Territory();
         topLeft.pawnStart = [this.board[2][0], this.board[2][1], this.board[2][2], this.board[1][2], this.board[0][2]];
@@ -202,13 +202,16 @@ class Board {
         botRight.flagshipStart = [this.board[10][10]];
         botRight.buildTiles = botRight.pawnStart.concat(botRight.knightStart, botRight.commandStart, botRight.flagshipStart);
         //Bottom Left
-        let BotLeft = new Territory();
-        BotLeft.pawnStart = [this.board[8][0], this.board[8][1], this.board[8][2], this.board[9][2], this.board[10][2]];
-        BotLeft.knightStart = [this.board[9][0], this.board[10][1]];
-        BotLeft.commandStart = [this.board[9][1]];
-        BotLeft.flagshipStart = [this.board[10][0]];
-        BotLeft.buildTiles = BotLeft.pawnStart.concat(BotLeft.knightStart, BotLeft.commandStart, BotLeft.flagshipStart);
-        this.territories.push(topLeft, topRight, botRight, BotLeft);
+        let botLeft = new Territory();
+        botLeft.pawnStart = [this.board[8][0], this.board[8][1], this.board[8][2], this.board[9][2], this.board[10][2]];
+        botLeft.knightStart = [this.board[9][0], this.board[10][1]];
+        botLeft.commandStart = [this.board[9][1]];
+        botLeft.flagshipStart = [this.board[10][0]];
+        botLeft.buildTiles = botLeft.pawnStart.concat(botLeft.knightStart, botLeft.commandStart, botLeft.flagshipStart);
+        this.territories.set("topLeft", topLeft);
+        this.territories.set("topRight", topRight);
+        this.territories.set("botRight", botRight);
+        this.territories.set("botLeft", botLeft);
         return;
     }
     getTile(coordinate) {

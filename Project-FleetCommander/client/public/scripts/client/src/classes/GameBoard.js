@@ -3,6 +3,7 @@ export class Tile {
         this.socket = socket;
         this.displayElement = display;
         this.coordinate = coordinate;
+        this.ships = new Set();
         this.setUpSocket();
         this.addHanldersToElements();
         return;
@@ -19,6 +20,7 @@ export class Board {
         this.socket = socket;
         this.displayElement = document.getElementById("Gameboard");
         this.tiles = [];
+        this.ships = new Map();
         this.setUpSocket();
         this.addHanldersToElements();
         this.createBlankBoard();

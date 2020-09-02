@@ -157,19 +157,23 @@ body {
 }
 /*Territory borders END*/
 
-div.playerOnePiece {
+div.Player1.ship {
+    color: black;
     background-color: red;
 }
 
-div.playerTwoPiece {
+div.Player2.ship {
+    color: black;
     background-color: yellow;
 }
 
-div.playerThreePiece {
+div.Player3.ship {
+    color: white;
     background-color: green;
 }
 
-div.playerFourPiece {
+div.Player4.ship {
+    color: white;
     background-color: blue;
 }
 
@@ -198,4 +202,58 @@ div.command {
 div.flagship {
     width: 30px;
     height: 30px;
+}
+
+
+
+div.Player1.knight {
+    background-image: url("../images/Player1Knight.png");
+}
+
+div.Player2.knight {
+    background-image: url("../images/Player2Knight.png");
+}
+
+div.Player3.knight {
+    background-image: url("../images/Player3Knight.png");
+}
+
+div.Player4.knight {
+    background-image: url("../images/Player4Knight.png");
+}
+
+
+
+div.Player1.command {
+    background-image: url("../images/Player1Command.png");
+}
+
+div.Player2.command {
+    background-image: url("../images/Player2Command.png");
+}
+
+div.Player3.command {
+    background-image: url("../images/Player3Command.png");
+}
+
+div.Player4.command {
+    background-image: url("../images/Player4Command.png");
+}
+
+
+
+div.Player1.flagship {
+    background-image: url("../images/Player1Flagship.png");
+}
+
+div.Player2.flagship {
+    background-image: url("../images/Player2Flagship.png");
+}
+
+div.Player3.flagship {
+    background-image: url("../images/Player3Flagship.png");
+}
+
+div.Player4.flagship {
+    background-image: url("../images/Player4Flagship.png");
 }
