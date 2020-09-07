@@ -1,6 +1,6 @@
+import { socket } from './MainModel.js';
 export class Chat {
-    constructor(socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElement = document.getElementById("Chat");
         this.ChatLogElement = document.getElementById("ChatLog");
         this.ChatLogTopElement = document.getElementById("ChatLogTop");
@@ -9,8 +9,8 @@ export class Chat {
         this.setUpSocket();
     }
     setUpSocket() {
-        this.socket.on('updateChat', (chatLog) => { this.updateChat(chatLog); });
-        this.socket.on('chat', (message) => { this.displayMessage(message); });
+        socket.on('updateChat', (chatLog) => { this.updateChat(chatLog); });
+        socket.on('chat', (message) => { this.displayMessage(message); });
         return;
     }
     clearChatLog() {
@@ -36,7 +36,7 @@ export class Chat {
         return;
     }
     sendMessage(message) {
-        this.socket.emit('chat', message);
+        socket.emit('chat', message);
         return;
     }
     chatInputHandler(event) {

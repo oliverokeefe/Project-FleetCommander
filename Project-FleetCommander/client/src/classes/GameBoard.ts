@@ -1,3 +1,4 @@
+import { socket, Game } from './MainModel.js';
 import { coordinate } from "../../../shared/src/types/types";
 import { Ship } from "./Ships.js";
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
@@ -12,19 +13,19 @@ import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 export class Tile {
 
-    public socket: SocketIOClient.Socket;
     public displayElement: HTMLDivElement;
-    public coordinate: coordinate
+    public rowcol: coordinate;
     public ships: Set<string>;
+    public stagedShips: Map<string, Ship>;
 
-    constructor(socket: SocketIOClient.Socket, display: HTMLDivElement, coordinate: coordinate) {
-        this.socket = socket;
+    constructor(display: HTMLDivElement, rowcol: coordinate) {
         this.displayElement = display;
-        this.coordinate = coordinate;
+        this.rowcol = rowcol;
         this.ships = new Set<string>();
+        this.stagedShips = new Map<string, Ship>();
 
         this.setUpSocket();
-        this.addHanldersToElements();
+        this.addEventHandlers();
         return;
     }
 
@@ -32,7 +33,67 @@ export class Tile {
         return;
     }
 
-    private addHanldersToElements(): void {
+    private addEventHandlers(): void {
+        this.displayElement.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.stageSelectedShip();
+        });
+        return;
+    }
+
+    public suggest(): void {
+        this.displayElement.classList.add("suggested");
+        return;
+    }
+
+    public clearSuggestion(): void {
+        this.displayElement.classList.remove("suggested");
+        return;
+    }
+
+    public stageSelectedShip(): void {
+        if(Game.selectedShip && this.displayElement.classList.contains("suggested")){
+            this.stageShip(Game.selectedShip);
+        }
+        Game.deselectShip();
+        return;
+    }
+
+    public stageShip(ship: Ship): void {
+        this.stagedShips.set(ship.globalId, ship);
+        ship.moveDelta = {
+            playerId: ship.playerId,
+            shipId: ship.id,
+            from: ship.position.rowcol,
+            to: this.rowcol
+        };
+        this.shadowStagedShip(ship);
+        return;
+    }
+
+    public removeStagedShip(ship: Ship): void {
+        if(this.stagedShips.has(ship.globalId)){
+            this.stagedShips.get(ship.globalId).shadow.removeShadowFromBoard();
+            this.stagedShips.delete(ship.globalId)
+        }
+        return;
+    }
+
+    public shadowStagedShip(ship: Ship): void {
+        ship.shadow.placeShadowOnTile(this);
+        return;
+    }
+
+    public moveStagedShips(ship: Ship): void {
+        this.stagedShips.forEach((ship: Ship) => {
+            ship.placeShipOnTile(this);
+        });
+        this.stagedShips.clear();
+        return;
+    }
+
+    public clearStagedShips(): void {
+        this.stagedShips.clear();
         return;
     }
 }
@@ -42,17 +103,16 @@ export class Board {
     static readonly MAXROW: number = 10;
     static readonly MAXCOL: number = 10;
 
-    public socket: SocketIOClient.Socket;
     public displayElement: HTMLDivElement;
     public tiles: Tile[][];
     public ships: Map<string, Ship>;
+    public suggestedTiles: Tile[];
 
-    constructor(socket: SocketIOClient.Socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElement = document.getElementById("Gameboard") as HTMLDivElement;
         this.tiles = [];
         this.ships = new Map<string, Ship>();
-
+        this.suggestedTiles = [];
         this.setUpSocket();
         this.addHanldersToElements();
         this.createBlankBoard();
@@ -98,7 +158,7 @@ export class Board {
         tile.classList.add("tile", `c${col}`, oddeven);
         tile.id = `r${row}c${col}`;
     
-        this.tiles[row].push(new Tile(this.socket, tile, [row,col]));
+        this.tiles[row].push(new Tile(tile, [row,col]));
     
         return tile;
     }
@@ -106,6 +166,22 @@ export class Board {
     public start(data: Delta.InitialGameState): void {
         //spawn all the ships or something
 
+        return;
+    }
+
+    public suggestTile(tile: Tile): void {
+        if(tile){
+            this.suggestedTiles.push(tile);
+            tile.suggest();
+        }
+        return;
+    }
+
+    public clearSuggestions(): void {
+        this.suggestedTiles.forEach((suggestedTile: Tile) => {
+            suggestedTile.clearSuggestion();
+        });
+        this.suggestedTiles = [];
         return;
     }
 

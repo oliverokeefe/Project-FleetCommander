@@ -1,16 +1,14 @@
+import { socket } from './MainModel.js';
 import { text } from "express";
 
 export class Chat {
-
-    public socket: SocketIOClient.Socket;
 
     public displayElement: HTMLDivElement;
     public ChatLogElement: HTMLDivElement;
     public ChatLogTopElement: HTMLDivElement;
     public ChatInputElement: HTMLInputElement;
 
-    constructor(socket: SocketIOClient.Socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElement = document.getElementById("Chat") as HTMLDivElement;
         this.ChatLogElement = document.getElementById("ChatLog") as HTMLDivElement;
         this.ChatLogTopElement = document.getElementById("ChatLogTop") as HTMLDivElement;
@@ -23,8 +21,8 @@ export class Chat {
 
     public setUpSocket(): void {
 
-        this.socket.on('updateChat', (chatLog: string[]) => { this.updateChat(chatLog) });
-        this.socket.on('chat', (message: string) => { this.displayMessage(message) });
+        socket.on('updateChat', (chatLog: string[]) => { this.updateChat(chatLog) });
+        socket.on('chat', (message: string) => { this.displayMessage(message) });
 
         return;
     }
@@ -55,7 +53,7 @@ export class Chat {
     }
 
     private sendMessage(message: string): void {
-        this.socket.emit('chat', message);
+        socket.emit('chat', message);
         return;
     }
 

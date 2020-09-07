@@ -115,21 +115,21 @@ export class Fleet {
 export abstract class Ship {
 
     abstract readonly shipClass: string;
-
+    abstract readonly globalId: string;
 
     public id: number;
     public player: string;
-    public globalId: string;
     public position: Tile;
-    public spawn: Tile
-    public value: number
+    public spawn: Tile;
+    public value: number;
+    public moveFinished: boolean;
 
     constructor(id: number, player: string, spawn: Tile) {
         this.id = id;
         this.player = player;
-        this.globalId = `${this.player}:${this.id}`;
         this.position = undefined;
         this.spawn = spawn;
+        this.moveFinished = false;
         this.value = 1;
         this.spawnShip();
     }
@@ -197,10 +197,12 @@ export abstract class Ship {
 export class Pawn extends Ship {
 
     readonly shipClass: string
+    readonly globalId: string;
 
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
         this.shipClass = "pawn";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 
 
@@ -209,11 +211,13 @@ export class Pawn extends Ship {
 export class Knight extends Ship {
 
     readonly shipClass: string;
+    readonly globalId: string;
 
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
         this.value = 2;
         this.shipClass = "knight";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 
 }
@@ -221,11 +225,13 @@ export class Knight extends Ship {
 export class Command extends Ship {
 
     readonly shipClass: string;
+    readonly globalId: string;
 
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
         this.value = 3;
         this.shipClass = "command";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 
 }
@@ -233,11 +239,13 @@ export class Command extends Ship {
 export class Flagship extends Ship {
 
     readonly shipClass: string;
-        
+    readonly globalId: string;
+
     constructor(id: number, player: string, spawn: Tile) {
         super(id, player, spawn);
         this.value = 5;
         this.shipClass = "flagship";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 
 }

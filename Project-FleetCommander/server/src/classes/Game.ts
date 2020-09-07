@@ -16,29 +16,32 @@ export class GameDelta {
 export class Game {
 
     public name: string;
-    public playerCount: number;
-    public players: { [player: string]: Player }
-    //public players: {
-    //    Player1: Player,
-    //    Player2: Player,
-    //    Player3: Player,
-    //    Player4: Player
-    //}
-    public chatLog: string[];
     public board: Board;
+    public playerCount: number;
+    public playerIds: string[];
+    public players: Map<string, Player>;
+    public chatLog: string[];
 
     constructor(name: string) {
         this.name = name;
-        this.playerCount = 0;
-        //this.players = {};
-        this.players = {
-            Player1: undefined,
-            Player2: undefined,
-            Player3: undefined,
-            Player4: undefined
-        }
-        this.chatLog = [];
         this.board = new Board();
+        this.playerCount = 0;
+        this.playerIds = [
+            "Player1",
+            "Player2",
+            "Player3",
+            "Player4"
+        ];
+        this.initPlayers();
+        this.chatLog = [];
+    }
+    
+    private initPlayers(): void {
+        this.players = new Map<string, Player>();
+        this.playerIds.forEach((id) => {
+            this.players.set(id, new Player(id, this.board.territories.get(id)));
+        });
+        return;
     }
 
     /**
@@ -66,14 +69,14 @@ export class Game {
         let initialShips: Delta.ShipData[] = [];
         //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
         //Then the const static data could be used here instead of constantly doing Object.keys()
-        Object.keys(this.players).forEach((playerId) => {
-            Object.keys(this.players[playerId].fleet.ships).forEach((shipClass) => {
-                Object.keys(this.players[playerId].fleet.ships[shipClass]).forEach((shipId) => {
+        this.playerIds.forEach((playerId) => {
+            Object.keys(this.players.get(playerId).fleet.ships).forEach((shipClass) => {
+                Object.keys(this.players.get(playerId).fleet.ships[shipClass]).forEach((shipId) => {
                     initialShips.push({
                         playerId: playerId,
                         shipId: shipId,
                         shipClass: shipClass,
-                        startLocation: (this.players[playerId].fleet.ships[shipClass][shipId] as Ship).position.coordinate
+                        startLocation: (this.players.get(playerId).fleet.ships[shipClass][shipId] as Ship).position.coordinate
                     });
                 });
             });
@@ -84,7 +87,7 @@ export class Game {
 
     private initialScores(): Delta.ScoreDelta[] {
         let initialScores: Delta.ScoreDelta[] = [];
-        Object.keys(this.players).forEach((playerId: string) => {
+        this.playerIds.forEach((playerId: string) => {
             initialScores.push({
                 playerId: playerId,
                 score: 0
@@ -97,57 +100,61 @@ export class Game {
         return "pawn";
     }
 
-    public update(): void {
+    public update(): Delta.ToClientDelta {
+        let data: Delta.ToClientDelta = {
+            spawns: [],
+            moves: [],
+            destroyed: [],
+            scores: [],
+            movePhase: ""
+        };
 
+        for(let i=0; i<11; i++) {
+            this.playerIds.forEach((id) => {
+                if(this.players.has(id)) {
+                    this.players.get(id).incrementalUpdate();
+                }
+            });
+        }
+
+        this.playerIds.forEach((id) => {
+            if(this.players.has(id)) {
+                data.spawns = data.spawns.concat(this.players.get(id).updateData.spawns);
+                data.moves = data.moves.concat(this.players.get(id).updateData.moves);
+                data.destroyed = data.destroyed.concat(this.players.get(id).updateData.destroyed);
+                data.scores = data.scores.concat(this.players.get(id).updateData.scores);
+                data.movePhase = this.nextMovePhase();
+            }
+        });
+
+        //-----This should be a useless call now...
+        this.clearAllPlayerActions();
+        //----
+
+        return data;
+    }
+
+    private nextMovePhase(): string {
+        //move the move phase forward and return the new phase;
         return;
     }
 
-    public addPlayer(id: string, name?: string): boolean {
-        let success: boolean = false;
-        if (this.players.hasOwnProperty(id) && !this.players[id]) {
-            this.players[id] = new Player(id, name);
-            let territoryKey = "";
-
-            switch(id){
-                case("Player1"): {
-                    territoryKey = "topLeft";
-                    break;
-                }
-                case("Player2"): {
-                    territoryKey = "topRight";
-                    break;
-                }
-                case("Player3"): {
-                    territoryKey = "botRight";
-                    break;
-                }
-                case("Player4"): {
-                    territoryKey = "botLeft";
-                    break;
-                }
-            }
-
-            if(!this.board.territories.get(territoryKey).player || !this.players[id].territory){
-                this.board.territories.get(territoryKey).player = this.players[id].id;
-                this.players[id].setTerritory(this.board.territories.get(territoryKey));
-            }
-            this.playerCount++;
-
-            success = true;
-        }
-        return success;
+    private addPlayer(id: string, name?: string): void {
+        this.players.get(id).connected = true;
+        this.players.get(id).name = (name) ? name : id;
+        this.playerCount++;
+        return;
     }
 
     public tryAddPlayer(playerName?: string): string {
-        let success: boolean = false;
         let firstAvailableId: string = this.getFirstAvailablePlayerSlot();
         playerName = (playerName) ? playerName : firstAvailableId;
 
         if (firstAvailableId) {
-            success = this.addPlayer(firstAvailableId, playerName);
+            this.addPlayer(firstAvailableId, playerName);
         }
 
-        return (success) ? firstAvailableId : "";
+        return (firstAvailableId) ? firstAvailableId : "";
     }
 
     /**
@@ -161,35 +168,12 @@ export class Game {
         return false;
     }
 
-    public removePlayer(playerId: string): boolean {
-        let success: boolean = false;
-        if (this.players[playerId]) {
-            let territoryKey: string = "";
-            switch(playerId){
-                case("Player1"): {
-                    territoryKey = "topLeft";
-                    break;
-                }
-                case("Player2"): {
-                    territoryKey = "topRight";
-                    break;
-                }
-                case("Player3"): {
-                    territoryKey = "botRight";
-                    break;
-                }
-                case("Player4"): {
-                    territoryKey = "botLeft";
-                    break;
-                }
-            }
-            this.board.territories.get(territoryKey).player = "";
-            this.players[playerId].clear();
-            this.players[playerId] = undefined;
+    public removePlayer(id: string): void {
+        if (this.players.has(id)) {
+            this.players.get(id).connected = false;
             this.playerCount--;
-            success = true;
         }
-        return success;
+        return;
     }
 
     /**
@@ -203,32 +187,63 @@ export class Game {
     }
 
     public getFirstAvailablePlayerSlot(): string {
-        let ids = Object.keys(this.players);
         let firstAvailable: string = undefined;
-        ids.forEach((id) => {
-            if (!this.players[id]) {
-                firstAvailable = (firstAvailable) ? firstAvailable : id;
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id)) {
+                if(!this.players.get(id).connected) {
+                    firstAvailable = (firstAvailable) ? firstAvailable : id;
+                }
             }
         });
         return firstAvailable;
     }
 
-    public readyPlayer(playerId): void {
-        this.players[playerId].setReady(true);
+    public readyPlayer(id): void {
+        if(this.players.has(id)){
+            this.players.get(id).setReady(true);
+        }
         return;
     }
 
     public allPlayersReady(): boolean {
-        let ids = Object.keys(this.players);
         let allReady: boolean = true;
-        ids.forEach((id) => {
-            if (this.players[id] && !this.players[id].ready) {
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id) && !this.players.get(id).ready) {
                 allReady = false;
-            } else if(!this.players[id]) {
+            } else if(!this.players.has(id)) {
                 allReady = false;
             }
         });
         return allReady;
+    }
+
+    public submitPlayerActions(id: string, data: Delta.FromClientDelta): void {
+        if(this.players.has(id) && !this.players.get(id).actions){
+            this.players.get(id).actions = data;
+        }
+        return;
+    }
+
+    public allPlayerActionsSubmitted(): boolean {
+        let allSubmitted: boolean = true;
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id) && !this.players.get(id).actions) {
+                allSubmitted = false;
+            } else if(!this.players.has(id)) {
+                allSubmitted = false;
+            }
+        });
+
+        return allSubmitted;
+    }
+
+    private clearAllPlayerActions(): void {
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id)) {
+                this.players.get(id).actions = undefined;
+            }
+        });
+        return;
     }
 
 }
@@ -256,13 +271,6 @@ export class GameList {
         if (this.games[game]) {
             delete this.games[game];
             this.total--;
-        }
-        return;
-    }
-
-    public addPlayerToGame(game: string, playerId: string): void {
-        if (this.games[game]) {
-            this.games[game].addPlayer(playerId);
         }
         return;
     }
@@ -332,8 +340,8 @@ export class GameList {
         }
     }
 
-    public playerInGame(game, player): boolean {
-        return (this.games[game] && this.games[game].players[player]) ? true : false;
+    public playerInGame(game, id): boolean {
+        return (this.games[game] && this.games[game].players.has(id) && this.games[game].players.get(id).connected) ? true : false;
     }
 
 }

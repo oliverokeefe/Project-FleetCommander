@@ -76,9 +76,9 @@ class Ship {
     constructor(id, player, spawn) {
         this.id = id;
         this.player = player;
-        this.globalId = `${this.player}:${this.id}`;
         this.position = undefined;
         this.spawn = spawn;
+        this.moveFinished = false;
         this.value = 1;
         this.spawnShip();
     }
@@ -136,6 +136,7 @@ class Pawn extends Ship {
     constructor(id, player, spawn) {
         super(id, player, spawn);
         this.shipClass = "pawn";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 }
 exports.Pawn = Pawn;
@@ -144,6 +145,7 @@ class Knight extends Ship {
         super(id, player, spawn);
         this.value = 2;
         this.shipClass = "knight";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 }
 exports.Knight = Knight;
@@ -152,6 +154,7 @@ class Command extends Ship {
         super(id, player, spawn);
         this.value = 3;
         this.shipClass = "command";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 }
 exports.Command = Command;
@@ -160,6 +163,7 @@ class Flagship extends Ship {
         super(id, player, spawn);
         this.value = 5;
         this.shipClass = "flagship";
+        this.globalId = `${this.player}:${this.shipClass}:${this.id}`;
     }
 }
 exports.Flagship = Flagship;

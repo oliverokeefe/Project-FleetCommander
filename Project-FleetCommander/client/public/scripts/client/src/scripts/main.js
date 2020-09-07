@@ -1,7 +1,9 @@
-import { MainModel } from '../classes/MainModel.js';
-let Model = undefined;
+// import { MainModel } from '../classes/MainModel.js';
+import * as MainModel from '../classes/MainModel.js';
+// let Model: MainModel = undefined;
 function init() {
-    Model = new MainModel();
+    // Model = new MainModel();
+    MainModel.init();
     console.log("initialized");
     return;
 }

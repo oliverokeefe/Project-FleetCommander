@@ -43,42 +43,19 @@ function isValidJoinData(joinData) {
         return false;
     }
 }
-function addPlayerToGame(socket, game, playerId) {
-    game = (game) ? game : socket.game;
-    playerId = (playerId) ? playerId : socket.player;
-    if (!Games.gameExists(game)) {
-        createNewGame(game);
-    }
-    if (playerId === GenSpecId) {
-        Games.addSpectatorToGame(game);
-        socket.game = game;
-        socket.player = playerId;
-        socket.join(socket.game);
-        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
-    }
-    else if (!Games.playerInGame(game, playerId)) {
-        Games.addPlayerToGame(game, playerId);
-        socket.game = game;
-        socket.player = playerId;
-        sendMessage(socket.game, `${socket.player} has joined the game`);
-        socket.join(socket.game);
-        socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog, Games.games[socket.game].board.board);
-    }
-    return;
-}
 function addPlayerToLobby(socket, game) {
     game = (game) ? game : socket.game;
     if (!Games.gameExists(game)) {
         createNewGame(game);
     }
     let playerId = Games.tryAddPlayerToGame(game);
-    console.log(`Join ${game} lobby attempt by ${playerId}`);
     if (playerId) {
         socket.game = game;
         socket.player = playerId;
         sendMessage(socket.game, `${socket.player} has joined the lobby`);
         socket.join(socket.game);
         socket.emit('joinLobby', socket.game);
+        socket.emit('createPlayer', socket.player);
         socket.emit('updateChat', Games.games[socket.game].chatLog);
         console.log(`${socket.player} has joined the ${socket.game} lobby`);
     }
@@ -110,7 +87,9 @@ function removePlayerFromGame(socket, game, player) {
         socket.game = "";
     }
 }
-function readyUp(game, playerId) {
+function readyUp(socket, game, playerId) {
+    game = (game) ? game : socket.game;
+    playerId = (playerId) ? playerId : socket.player;
     if (Games.gameExists(game)) {
         Games.readyPlayerInGame(game, playerId);
         sendMessage(game, `${playerId} Ready!`);
@@ -130,6 +109,19 @@ function startGame(game) {
     }
     return;
 }
+function submitPlayerActions(socket, data, game, playerId) {
+    game = (game) ? game : socket.game;
+    playerId = (playerId) ? playerId : socket.player;
+    /*
+        if(Games.gameExists(game)){
+            Games.games[game].submitPlayerActions(playerId, data);
+            if(Games.games[game].allPlayerActionsSubmitted()) {
+                io.to(game).emit('update', Games.games[game].update());
+            }
+        }
+    */
+    return;
+}
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -140,13 +132,7 @@ io.on('connection', (socket) => {
     ///++++++++++++++++++++++++++++++++++++++++++++++++++
     socket.on('joinLobby', (game) => {
         if (game) {
-            console.log(`Attempt to join ${game} lobby`);
             addPlayerToLobby(socket, game);
-        }
-    });
-    socket.on('joinGame', (joinData) => {
-        if (isValidJoinData(joinData)) {
-            addPlayerToGame(socket, joinData.game, joinData.player);
         }
     });
     socket.on('chat', (message) => {
@@ -158,7 +144,10 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('ready', () => {
-        readyUp(socket.game, socket.player);
+        readyUp(socket);
+    });
+    socket.on('submitActions', (data) => {
+        submitPlayerActions(socket, data);
     });
     socket.on('leaveGame', () => {
         removePlayerFromGame(socket);

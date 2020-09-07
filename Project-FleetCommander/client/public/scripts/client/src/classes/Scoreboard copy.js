@@ -1,4 +1,4 @@
-import { socket, Game } from './MainModel.js';
+import { Game } from './MainModel.js';
 import { Ship } from './Ships.js';
 export class Scoreboard {
     constructor() {
@@ -38,9 +38,6 @@ export class Scoreboard {
     }
     submitMoveBtnHandler() {
         console.log("submit move button clicked");
-        this.SubmitMoveBtn.disabled = true;
-        let data = Game.buildUpdateDelta();
-        socket.emit('submitActions', data);
         return;
     }
     update(scores, movePhase) {
@@ -60,4 +57,4 @@ export class Scoreboard {
         return;
     }
 }
-//# sourceMappingURL=Scoreboard.js.map
+//# sourceMappingURL=Scoreboard copy.js.map

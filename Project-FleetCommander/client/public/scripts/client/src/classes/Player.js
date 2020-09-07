@@ -1,3 +1,4 @@
+import * as Ship from "./Ships.js";
 /*
  *
  * Keep track of player resources (ships, points)
@@ -6,24 +7,24 @@
  *
  */
 export class Player {
-    constructor(name) {
-        this.name = name;
+    constructor(id, name) {
+        this.id = id;
+        this.name = (name) ? name : undefined;
         this.score = 0;
-        // this.territory = undefined;
-        this.ships = [];
+        this.ships = new Map();
+        this.ships.set(Ship.Ship.SHIPCLASSES.PAWN, new Map());
+        this.ships.set(Ship.Ship.SHIPCLASSES.KNIGHT, new Map());
+        this.ships.set(Ship.Ship.SHIPCLASSES.COMMAND, new Map());
+        this.ships.set(Ship.Ship.SHIPCLASSES.FLAGSHIP, new Map());
+        this.setUpSocket();
+    }
+    setUpSocket() {
+        return;
+    }
+    clearSocket() {
+        return;
     }
     ready() {
-        //singal player to the server the player is ready
-        // This may include submiting any moves that have been made
-        return;
-    }
-    setUpSocket(socket) {
-        // adds the handlers to the socket for the events that occur during the game
-        // the handlers will be functions of this GameData class.
-        return;
-    }
-    clearSocket(socket) {
-        // Remove all event handlers that were added in the setUpSocket function
         return;
     }
 }

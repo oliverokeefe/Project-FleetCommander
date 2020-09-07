@@ -1,17 +1,17 @@
+import { socket } from './MainModel.js';
 import { Chat } from './Chat.js';
 export class Lobby {
-    constructor(socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElement = document.getElementById("Lobby");
         this.GameNameElement = document.getElementById("GameName");
         this.PlayerInputElement = document.getElementById("PlayerInput");
         this.ReadyBtnElement = document.getElementById("ReadyBtn");
-        this.Chat = new Chat(socket);
+        this.Chat = new Chat();
         this.setUpSocket();
         this.addHandlersToElements();
     }
     setUpSocket() {
-        this.socket.on('joinLobby', (game) => { this.joinLobby(game); });
+        socket.on('joinLobby', (game) => { this.joinLobby(game); });
         return;
     }
     addHandlersToElements() {
@@ -23,7 +23,7 @@ export class Lobby {
         return;
     }
     readyBtnHandler() {
-        this.socket.emit('ready');
+        socket.emit('ready');
         return;
     }
 }

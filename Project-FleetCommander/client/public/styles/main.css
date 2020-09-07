@@ -1,13 +1,20 @@
 :root {
     --main-bg-color: lightgray;
     --scnd-bg-color: darkgray;
+    --main-suggested-bg-color: rgb(200, 200, 255);
+    --scnd-suggested-bg-color: rgb(185, 185, 255);
+    --hver-suggested-bg-color: rgb(165,165,255);
     --tile-size: 63px;
     --std-border-width: 10px;
     --cluster-border-color: black;
-    --player-one-color: red;
-    --player-two-color: yellow;
-    --player-three-color: green;
-    --player-four-color: blue;
+    --player-one-main-color: red;
+    --player-two-main-color: yellow;
+    --player-three-main-color: green;
+    --player-four-main-color: rgb(0, 165, 255);
+    --player-one-scnd-color: rgba(255, 0, 0, 0.4);
+    --player-two-scnd-color: rgba(255, 255, 0, 0.4);
+    --player-three-scnd-color: rgba(0, 128, 0, 0.4);
+    --player-four-scnd-color: rgb(0, 165, 255, 0.4);
 }
 
 body {
@@ -53,6 +60,12 @@ body {
     margin-left: 5px;
 }
 
+#Scoreboard, #ShipInfo {
+    border: 3px solid white;
+    padding: 3px;
+    display: table;
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -67,6 +80,7 @@ body {
     background-color: var(--main-bg-color);
     border: var(--std-border-width) solid var(--main-bg-color);
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
 }
@@ -76,27 +90,40 @@ body {
     border: var(--std-border-width) solid var(--scnd-bg-color);
 }
 
+.tile.suggested {
+    background-color: var(--main-suggested-bg-color);
+}
+
+.odd .tile.even.suggested, .even .tile.odd.suggested {
+    background-color: var(--scnd-suggested-bg-color);
+}
+
+.tile.suggested:hover,
+.odd .tile.even.suggested:hover, .even .tile.odd.suggested:hover {
+    background-color: var(--hver-suggested-bg-color);
+}
+
 
 /*cluster borders BEGIN*/
-.r4 .c1, .r4 .c9, .r0 .c5, .r8 .c5 {
+#r4c1, #r4c9, #r0c5, #r8c5 {
     border-left: var(--std-border-width) solid var(--cluster-border-color);
     border-top: var(--std-border-width) solid var(--cluster-border-color);
     border-right: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r5 .c2, .r5 .c10, .r1 .c6, .r9 .c6 {
+#r5c2, #r5c10, #r1c6, #r9c6 {
     border-top: var(--std-border-width) solid var(--cluster-border-color);
     border-right: var(--std-border-width) solid var(--cluster-border-color);
     border-bottom: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r6 .c1, .r6 .c9, .r2 .c5, .r10 .c5 {
+#r6c1, #r6c9, #r2c5, #r10c5 {
     border-right: var(--std-border-width) solid var(--cluster-border-color);
     border-bottom: var(--std-border-width) solid var(--cluster-border-color);
     border-left: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r5 .c0, .r5 .c8, .r1 .c4, .r9 .c4 {
+#r5c0, #r5c8, #r1c4, #r9c4 {
     border-bottom: var(--std-border-width) solid var(--cluster-border-color);
     border-left: var(--std-border-width) solid var(--cluster-border-color);
     border-top: var(--std-border-width) solid var(--cluster-border-color);
@@ -105,103 +132,117 @@ body {
 
 
 /*center border BEGIN*/
-.r4 .c4, .r4 .c5, .r4 .c6 {
+#r4c4, #r4c5, #r4c6 {
     border-top: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r4 .c6, .r5 .c6, .r6 .c6 {
+#r4c6, #r5c6, #r6c6 {
     border-right: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r6 .c4, .r6 .c5, .r6 .c6 {
+#r6c4, #r6c5, #r6c6 {
     border-bottom: var(--std-border-width) solid var(--cluster-border-color);
 }
 
-.r4 .c4, .r5 .c4, .r6 .c4 {
+#r4c4, #r5c4, #r6c4 {
     border-left: var(--std-border-width) solid var(--cluster-border-color);
 }
 /*center border END*/
 
 
 /*Territory borders BEGIN*/
-.r2 .c0, .r2 .c1, .r2 .c2 {
-    border-bottom: var(--std-border-width) solid var(--player-one-color);
+#r2c0, #r2c1, #r2c2 {
+    border-bottom: var(--std-border-width) solid var(--player-one-main-color);
 }
 
-.r0 .c2, .r1 .c2, .r2 .c2 {
-    border-right: var(--std-border-width) solid var(--player-one-color);
+#r0c2, #r1c2, #r2c2 {
+    border-right: var(--std-border-width) solid var(--player-one-main-color);
 }
 
-.r0 .c8, .r1 .c8, .r2 .c8 {
-    border-left: var(--std-border-width) solid var(--player-two-color);
+#r0c8, #r1c8, #r2c8 {
+    border-left: var(--std-border-width) solid var(--player-two-main-color);
 }
 
-.r2 .c8, .r2 .c9, .r2 .c10 {
-    border-bottom: var(--std-border-width) solid var(--player-two-color);
+#r2c8, #r2c9, #r2c10 {
+    border-bottom: var(--std-border-width) solid var(--player-two-main-color);
 }
 
-.r8 .c8, .r8 .c9, .r8 .c10 {
-    border-top: var(--std-border-width) solid var(--player-three-color);
+#r8c8, #r8c9, #r8c10 {
+    border-top: var(--std-border-width) solid var(--player-three-main-color);
 }
 
-.r8 .c8, .r9 .c8, .r10 .c8 {
-    border-left: var(--std-border-width) solid var(--player-three-color);
+#r8c8, #r9c8, #r10c8 {
+    border-left: var(--std-border-width) solid var(--player-three-main-color);
 }
 
-.r8 .c2, .r9 .c2, .r10 .c2 {
-    border-right: var(--std-border-width) solid var(--player-four-color);
+#r8c2, #r9c2, #r10c2 {
+    border-right: var(--std-border-width) solid var(--player-four-main-color);
 }
 
-.r8 .c0, .r8 .c1, .r8 .c2 {
-    border-top: var(--std-border-width) solid var(--player-four-color);
+#r8c0, #r8c1, #r8c2 {
+    border-top: var(--std-border-width) solid var(--player-four-main-color);
 }
 /*Territory borders END*/
 
-div.Player1.ship {
-    color: black;
-    background-color: red;
-}
 
-div.Player2.ship {
-    color: black;
-    background-color: yellow;
-}
 
-div.Player3.ship {
-    color: white;
-    background-color: green;
-}
 
-div.Player4.ship {
-    color: white;
-    background-color: blue;
-}
+
 
 .ship {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
+    border: 3px solid white;
     background-color: black;
     text-align: center;
 }
 
+
+
 div.pawn {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
 }
 
 div.knight {
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
 }
 
 div.command {
-    width: 25px;
-    height: 25px;
+    width: 14px;
+    height: 14px;
 }
 
 div.flagship {
-    width: 30px;
-    height: 30px;
+    width: 14px;
+    height: 14px;
+}
+
+
+
+.Player1.ship {
+    color: black;
+    background-color: var(--player-one-main-color);
+    border: 3px solid var(--player-one-main-color);
+}
+
+.Player2.ship {
+    color: black;
+    background-color: var(--player-two-main-color);
+    border: 3px solid var(--player-two-main-color);
+}
+
+.Player3.ship {
+    color: white;
+    background-color: var(--player-three-main-color);
+    border: 3px solid var(--player-three-main-color);
+}
+
+.Player4.ship {
+    color: white;
+    background-color: var(--player-four-main-color);
+    border: 3px solid var(--player-four-main-color);
 }
 
 
@@ -257,3 +298,41 @@ div.Player3.flagship {
 div.Player4.flagship {
     background-image: url("../images/Player4Flagship.png");
 }
+
+
+
+.Player1.ship.shadow {
+    color: black;
+    background-color: var(--player-one-scnd-color);
+    border: 2px solid var(--player-one-scnd-color);
+}
+
+.Player2.ship.shadow {
+    color: black;
+    background-color: var(--player-two-scnd-color);
+    border: 2px solid var(--player-two-scnd-color);
+}
+
+.Player3.ship.shadow {
+    color: white;
+    background-color: var(--player-three-scnd-color);
+    border: 2px solid var(--player-three-scnd-color);
+}
+
+.Player4.ship.shadow {
+    color: white;
+    background-color: var(--player-four-scnd-color);
+    border: 2px solid var(--player-four-scnd-color);
+}
+
+
+
+div.ship.highlight {
+    border: 3px solid black;
+}
+
+div.ship.shadow.highlight {
+    border: 3px solid rgb(0, 0, 0, 0.4);
+}
+
+

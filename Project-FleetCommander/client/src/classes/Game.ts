@@ -1,6 +1,7 @@
 
-
+import { socket } from './MainModel.js';
 import { Scoreboard } from './Scoreboard.js' 
+import { ShipInfo } from './ShipInfo.js';
 import { Board } from './Gameboard.js';
 import { Player } from './Player.js';
 import * as Ship from './Ships.js'
@@ -8,17 +9,22 @@ import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 export class Game {
 
-    public socket: SocketIOClient.Socket;
     public displayElement: HTMLDivElement;
     public Scoreboard: Scoreboard;
+    public ShipInfoDisplay: ShipInfo;
     public Player: Player;
     public Board: Board;
+    public movePhase: string;
+    public selectedShip: Ship.Ship;
 
-    constructor(socket: SocketIOClient.Socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElement = document.getElementById("Game") as HTMLDivElement;
-
-        this.Board = new Board(socket);
+        this.Player = undefined;
+        this.Scoreboard = new Scoreboard();
+        this.ShipInfoDisplay = new ShipInfo();
+        this.Board = new Board();
+        this.movePhase = undefined;
+        this.selectedShip = undefined;
 
 
         this.setUpSocket();
@@ -26,8 +32,9 @@ export class Game {
     }
 
     private setUpSocket(): void {
-        this.socket.on('start', (data: Delta.InitialGameState) => { this.start(data) });
-        this.socket.on('update', (data: Delta.ToClientDelta) => { this.update(data) });
+        socket.on('createPlayer', (id: string) => { this.Player = new Player(id) });
+        socket.on('start', (data: Delta.InitialGameState) => { this.start(data) });
+        socket.on('update', (data: Delta.ToClientDelta) => { this.update(data) });
         return;
     }
 
@@ -41,61 +48,94 @@ export class Game {
     }
 
     public start(data: Delta.InitialGameState): void {
-        //Set the players initial scores
-        
-        //Set the initial move phase
-        
-        //Create **and spawn** the ships listed
-        data.ships.forEach((shipData: Delta.ShipData) => {
-            let ship: Ship.Pawn | Ship.Knight | Ship.Command | Ship.Flagship = undefined;
-            switch(shipData.shipClass){
-                case(Ship.Ship.SHIPCLASSES.PAWN): {
-                    ship = new Ship.Pawn(
-                        shipData.shipId,
-                        shipData.playerId,
-                        this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
-                    );
-                    break;
-                }
-                case(Ship.Ship.SHIPCLASSES.KNIGHT): {
-                    ship = new Ship.Knight(
-                        shipData.shipId,
-                        shipData.playerId,
-                        this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
-                    );
-                    break;
-                }
-                case(Ship.Ship.SHIPCLASSES.COMMAND): {
-                    ship = new Ship.Command(
-                        shipData.shipId,
-                        shipData.playerId,
-                        this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
-                    );
-                    break;
-                }
-                case(Ship.Ship.SHIPCLASSES.FLAGSHIP): {
-                    ship = new Ship.Flagship(
-                        shipData.shipId,
-                        shipData.playerId,
-                        this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
-                    );
-                    break;
-                }
-            }
-            this.Board.ships.set(ship.globalId, ship);
-        });
+        if(this.Player && this.Scoreboard){
 
-        //Reveal all of it (remove any/all nodisp classes)
-        this.displayElement.classList.remove("nodisp");
-        console.log(data);
+            this.Scoreboard.start(data.scores, data.movePhase);
+            
+            data.ships.forEach((shipData: Delta.ShipData) => {
+                let ship: Ship.Pawn | Ship.Knight | Ship.Command | Ship.Flagship = undefined;
+                switch(shipData.shipClass){
+                    case(Ship.Ship.SHIPCLASSES.PAWN): {
+                        ship = new Ship.Pawn(
+                            shipData.shipId,
+                            shipData.playerId,
+                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                        );
+                        break;
+                    }
+                    case(Ship.Ship.SHIPCLASSES.KNIGHT): {
+                        ship = new Ship.Knight(
+                            shipData.shipId,
+                            shipData.playerId,
+                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                        );
+                        break;
+                    }
+                    case(Ship.Ship.SHIPCLASSES.COMMAND): {
+                        ship = new Ship.Command(
+                            shipData.shipId,
+                            shipData.playerId,
+                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                        );
+                        break;
+                    }
+                    case(Ship.Ship.SHIPCLASSES.FLAGSHIP): {
+                        ship = new Ship.Flagship(
+                            shipData.shipId,
+                            shipData.playerId,
+                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                        );
+                        break;
+                    }
+                }
+                this.Board.ships.set(ship.globalId, ship);
+                if(this.Player.id === ship.playerId){
+                    this.Player.ships.get(ship.shipClass).set(ship.id, ship);
+                }
+            });
+            this.displayElement.classList.remove("nodisp");
+        }
         return;
     }
 
     public update(data: Delta.ToClientDelta): void {
+
+        this.Scoreboard.SubmitMoveBtn.disabled = false;
         return;
     }
     
     public clearGame(): void {
         return;
+    }
+
+    public deselectShip(): void {
+        this.selectedShip = undefined;
+        this.Board.clearSuggestions();
+        return;
+    }
+
+    public buildUpdateDelta(): Delta.FromClientDelta {
+        let data: Delta.FromClientDelta = {
+            spawnAttempts: this.getSpawns(),
+            moveAttempts: this.getMoves()
+        }
+        return data;
+    }
+    
+    /**
+     * TODO.... Currently cannot rebuild ships anyway
+     */
+    public getSpawns(): Delta.SpawnDelta[] {
+        return [];
+    }
+    
+    public getMoves(): Delta.MoveDelta[] {
+        let moves: Delta.MoveDelta[] = [];
+        this.Player.ships.get(this.movePhase).forEach((ship: Ship.Ship) => {
+            if(ship.moveDelta){
+                moves.push(ship.moveDelta);
+            }
+        });
+        return moves;
     }
 }

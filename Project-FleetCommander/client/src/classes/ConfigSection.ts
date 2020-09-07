@@ -1,13 +1,13 @@
+import { socket } from './MainModel.js';
+
 
 export class ConfigSection {
 
-    public socket: SocketIOClient.Socket;
     public displayElememt: HTMLDivElement;
     public GameInputElement: HTMLInputElement;
     public JoinBtnElement: HTMLButtonElement;
 
-    constructor(socket: SocketIOClient.Socket) {
-        this.socket = socket;
+    constructor() {
         this.displayElememt = document.getElementById("Config") as HTMLDivElement;
         this.GameInputElement = document.getElementById("GameInput") as HTMLInputElement;
         this.JoinBtnElement = document.getElementById("JoinBtn") as HTMLButtonElement;
@@ -27,9 +27,9 @@ export class ConfigSection {
 
     private joinBtnHandler(): void {
         let game = this.GameInputElement.value.trim();
-        if (game) {
-            this.socket.emit('leaveGame');
-            this.socket.emit('joinLobby', game);
+        if (game && socket) {
+            socket.emit('leaveGame');
+            socket.emit('joinLobby', game);
         }
         console.log("join lobby button clicked!");
         return;

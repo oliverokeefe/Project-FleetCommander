@@ -13,16 +13,23 @@ exports.GameDelta = GameDelta;
 class Game {
     constructor(name) {
         this.name = name;
-        this.playerCount = 0;
-        //this.players = {};
-        this.players = {
-            Player1: undefined,
-            Player2: undefined,
-            Player3: undefined,
-            Player4: undefined
-        };
-        this.chatLog = [];
         this.board = new GameBoard_1.Board();
+        this.playerCount = 0;
+        this.playerIds = [
+            "Player1",
+            "Player2",
+            "Player3",
+            "Player4"
+        ];
+        this.initPlayers();
+        this.chatLog = [];
+    }
+    initPlayers() {
+        this.players = new Map();
+        this.playerIds.forEach((id) => {
+            this.players.set(id, new Player_1.Player(id, this.board.territories.get(id)));
+        });
+        return;
     }
     /**
      * Still needs error checking.... Like the rest of the code..
@@ -44,14 +51,14 @@ class Game {
         let initialShips = [];
         //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
         //Then the const static data could be used here instead of constantly doing Object.keys()
-        Object.keys(this.players).forEach((playerId) => {
-            Object.keys(this.players[playerId].fleet.ships).forEach((shipClass) => {
-                Object.keys(this.players[playerId].fleet.ships[shipClass]).forEach((shipId) => {
+        this.playerIds.forEach((playerId) => {
+            Object.keys(this.players.get(playerId).fleet.ships).forEach((shipClass) => {
+                Object.keys(this.players.get(playerId).fleet.ships[shipClass]).forEach((shipId) => {
                     initialShips.push({
                         playerId: playerId,
                         shipId: shipId,
                         shipClass: shipClass,
-                        startLocation: this.players[playerId].fleet.ships[shipClass][shipId].position.coordinate
+                        startLocation: this.players.get(playerId).fleet.ships[shipClass][shipId].position.coordinate
                     });
                 });
             });
@@ -60,7 +67,7 @@ class Game {
     }
     initialScores() {
         let initialScores = [];
-        Object.keys(this.players).forEach((playerId) => {
+        this.playerIds.forEach((playerId) => {
             initialScores.push({
                 playerId: playerId,
                 score: 0
@@ -72,48 +79,51 @@ class Game {
         return "pawn";
     }
     update() {
+        let data = {
+            spawns: [],
+            moves: [],
+            destroyed: [],
+            scores: [],
+            movePhase: ""
+        };
+        for (let i = 0; i < 11; i++) {
+            this.playerIds.forEach((id) => {
+                if (this.players.has(id)) {
+                    this.players.get(id).incrementalUpdate();
+                }
+            });
+        }
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id)) {
+                data.spawns = data.spawns.concat(this.players.get(id).updateData.spawns);
+                data.moves = data.moves.concat(this.players.get(id).updateData.moves);
+                data.destroyed = data.destroyed.concat(this.players.get(id).updateData.destroyed);
+                data.scores = data.scores.concat(this.players.get(id).updateData.scores);
+                data.movePhase = this.nextMovePhase();
+            }
+        });
+        //-----This should be a useless call now...
+        this.clearAllPlayerActions();
+        //----
+        return data;
+    }
+    nextMovePhase() {
+        //move the move phase forward and return the new phase;
         return;
     }
     addPlayer(id, name) {
-        let success = false;
-        if (this.players.hasOwnProperty(id) && !this.players[id]) {
-            this.players[id] = new Player_1.Player(id, name);
-            let territoryKey = "";
-            switch (id) {
-                case ("Player1"): {
-                    territoryKey = "topLeft";
-                    break;
-                }
-                case ("Player2"): {
-                    territoryKey = "topRight";
-                    break;
-                }
-                case ("Player3"): {
-                    territoryKey = "botRight";
-                    break;
-                }
-                case ("Player4"): {
-                    territoryKey = "botLeft";
-                    break;
-                }
-            }
-            if (!this.board.territories.get(territoryKey).player || !this.players[id].territory) {
-                this.board.territories.get(territoryKey).player = this.players[id].id;
-                this.players[id].setTerritory(this.board.territories.get(territoryKey));
-            }
-            this.playerCount++;
-            success = true;
-        }
-        return success;
+        this.players.get(id).connected = true;
+        this.players.get(id).name = (name) ? name : id;
+        this.playerCount++;
+        return;
     }
     tryAddPlayer(playerName) {
-        let success = false;
         let firstAvailableId = this.getFirstAvailablePlayerSlot();
         playerName = (playerName) ? playerName : firstAvailableId;
         if (firstAvailableId) {
-            success = this.addPlayer(firstAvailableId, playerName);
+            this.addPlayer(firstAvailableId, playerName);
         }
-        return (success) ? firstAvailableId : "";
+        return (firstAvailableId) ? firstAvailableId : "";
     }
     /**
      * TODO
@@ -123,35 +133,12 @@ class Game {
         //Spectators have no need for a data model
         return false;
     }
-    removePlayer(playerId) {
-        let success = false;
-        if (this.players[playerId]) {
-            let territoryKey = "";
-            switch (playerId) {
-                case ("Player1"): {
-                    territoryKey = "topLeft";
-                    break;
-                }
-                case ("Player2"): {
-                    territoryKey = "topRight";
-                    break;
-                }
-                case ("Player3"): {
-                    territoryKey = "botRight";
-                    break;
-                }
-                case ("Player4"): {
-                    territoryKey = "botLeft";
-                    break;
-                }
-            }
-            this.board.territories.get(territoryKey).player = "";
-            this.players[playerId].clear();
-            this.players[playerId] = undefined;
+    removePlayer(id) {
+        if (this.players.has(id)) {
+            this.players.get(id).connected = false;
             this.playerCount--;
-            success = true;
         }
-        return success;
+        return;
     }
     /**
      * TODO
@@ -161,31 +148,59 @@ class Game {
         return false;
     }
     getFirstAvailablePlayerSlot() {
-        let ids = Object.keys(this.players);
         let firstAvailable = undefined;
-        ids.forEach((id) => {
-            if (!this.players[id]) {
-                firstAvailable = (firstAvailable) ? firstAvailable : id;
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id)) {
+                if (!this.players.get(id).connected) {
+                    firstAvailable = (firstAvailable) ? firstAvailable : id;
+                }
             }
         });
         return firstAvailable;
     }
-    readyPlayer(playerId) {
-        this.players[playerId].setReady(true);
+    readyPlayer(id) {
+        if (this.players.has(id)) {
+            this.players.get(id).setReady(true);
+        }
         return;
     }
     allPlayersReady() {
-        let ids = Object.keys(this.players);
         let allReady = true;
-        ids.forEach((id) => {
-            if (this.players[id] && !this.players[id].ready) {
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id) && !this.players.get(id).ready) {
                 allReady = false;
             }
-            else if (!this.players[id]) {
+            else if (!this.players.has(id)) {
                 allReady = false;
             }
         });
         return allReady;
+    }
+    submitPlayerActions(id, data) {
+        if (this.players.has(id) && !this.players.get(id).actions) {
+            this.players.get(id).actions = data;
+        }
+        return;
+    }
+    allPlayerActionsSubmitted() {
+        let allSubmitted = true;
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id) && !this.players.get(id).actions) {
+                allSubmitted = false;
+            }
+            else if (!this.players.has(id)) {
+                allSubmitted = false;
+            }
+        });
+        return allSubmitted;
+    }
+    clearAllPlayerActions() {
+        this.playerIds.forEach((id) => {
+            if (this.players.has(id)) {
+                this.players.get(id).actions = undefined;
+            }
+        });
+        return;
     }
 }
 exports.Game = Game;
@@ -205,12 +220,6 @@ class GameList {
         if (this.games[game]) {
             delete this.games[game];
             this.total--;
-        }
-        return;
-    }
-    addPlayerToGame(game, playerId) {
-        if (this.games[game]) {
-            this.games[game].addPlayer(playerId);
         }
         return;
     }
@@ -271,8 +280,8 @@ class GameList {
             this.deleteGame(game);
         }
     }
-    playerInGame(game, player) {
-        return (this.games[game] && this.games[game].players[player]) ? true : false;
+    playerInGame(game, id) {
+        return (this.games[game] && this.games[game].players.has(id) && this.games[game].players.get(id).connected) ? true : false;
     }
 }
 exports.GameList = GameList;

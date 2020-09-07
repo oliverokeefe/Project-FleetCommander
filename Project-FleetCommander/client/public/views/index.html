@@ -18,7 +18,7 @@
             </div>
             <!--Lobby to wait for all players to ready up and personalize-->
             <div id="Lobby" class="nodisp">
-                <div id="GameName">Game:</div>
+                <div id="GameName"></div>
                 <input id="PlayerInput" type="text" placeholder="name..." />
                 <button id="ReadyBtn">Ready</button>
                 <div id="Chat">
@@ -32,21 +32,29 @@
             <div id="Game" class="nodisp">
                 
                 <div id="box">
-                    <div id="Scoreboard" class="nodisp">
-                        <div id="PlayerInfo" class="boxItem">
-                            <div id="PlayerName">Name:</div>
+                    <div id="Gameboard" class="board boxItem nodisp"></div>
+                    <div id="Scoreboard" class="nodisp boxItem">
+                        <div id="PlayerInfo">
+                            <div id="PlayerName"></div>
                             <div id="PlayerScore"></div>
                         </div>
-                        <div id="PhaseDisplay"></div>
+                        <div id="MovePhase"></div>
                         <div id="Scores">
                             <div id="Player1Score"></div>
                             <div id="Player2Score"></div>
                             <div id="Player3Score"></div>
                             <div id="Player4Score"></div>
                         </div>
-                        <button id="SubmitMoveBtn"></button>
+                        <button id="SubmitMoveBtn">Submit</button>
                     </div>
-                    <div id="Gameboard" class="board boxItem nodisp"></div>
+                    <div id="ShipInfo" class="boxItem">
+                        <div id="PlayerId"></div>
+                        <div id="ShipId"></div>
+                        <div id="ShipClass"></div>
+                        <div id="ShipBC"></div>
+                        <div id="ShipFrom"></div>
+                        <div id="ShipTo"></div>
+                    </div>
                 </div>
 
             </div>

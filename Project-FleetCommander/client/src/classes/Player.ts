@@ -1,6 +1,7 @@
 import * as Ship from "./Ships.js";
 
 
+import { socket, Game } from './MainModel.js';
 
 /*
  * 
@@ -13,39 +14,38 @@ import * as Ship from "./Ships.js";
 
 export class Player {
 
+    public id: string;
     public name: string;
     public score: number;
-    // public territory: Territory;
-    public ships: Ship.Ship[];
+    // public ships: Map<string, Ship.Ship>;
+    public ships: Map<string, Map<string, Ship.Ship>>;
 
     public scoreDisplay: HTMLDivElement;
 
 
-    constructor(name: string) {
-        this.name = name;
+    constructor(id: string, name?: string) {
+        this.id = id;
+        this.name = (name) ? name : undefined;
         this.score = 0;
-        // this.territory = undefined;
-        this.ships = [];
+        this.ships = new Map<string, Map<string, Ship.Ship>>();
+
+        this.ships.set(Ship.Ship.SHIPCLASSES.PAWN, new Map<string, Ship.Pawn>());
+        this.ships.set(Ship.Ship.SHIPCLASSES.KNIGHT, new Map<string, Ship.Knight>());
+        this.ships.set(Ship.Ship.SHIPCLASSES.COMMAND, new Map<string, Ship.Command>());
+        this.ships.set(Ship.Ship.SHIPCLASSES.FLAGSHIP, new Map<string, Ship.Flagship>());
+
+        this.setUpSocket();
     }
 
+    private setUpSocket(): void {
+        return;
+    }
 
-
+    public clearSocket(): void {
+        return;
+    }
 
     public ready(): void {
-        //singal player to the server the player is ready
-        // This may include submiting any moves that have been made
-        return;
-    }
-
-
-    public setUpSocket(socket: SocketIOClient.Socket): void {
-        // adds the handlers to the socket for the events that occur during the game
-        // the handlers will be functions of this GameData class.
-        return;
-    }
-
-    public clearSocket(socket: SocketIOClient.Socket): void {
-        // Remove all event handlers that were added in the setUpSocket function
         return;
     }
 

@@ -255,10 +255,10 @@ export class Board {
         botLeft.flagshipStart = [this.board[10][0]];
         botLeft.buildTiles = botLeft.pawnStart.concat(botLeft.knightStart, botLeft.commandStart, botLeft.flagshipStart);
 
-        this.territories.set("topLeft", topLeft);
-        this.territories.set("topRight", topRight);
-        this.territories.set("botRight", botRight);
-        this.territories.set("botLeft", botLeft);
+        this.territories.set("Player1", topLeft);
+        this.territories.set("Player2", topRight);
+        this.territories.set("Player3", botRight);
+        this.territories.set("Player4", botLeft);
 
         return;
     }

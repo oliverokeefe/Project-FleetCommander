@@ -58,41 +58,6 @@ function isValidJoinData(joinData: joinData): boolean {
     }
 }
 
-function addPlayerToGame(socket: SocketIO.Socket, game?: string, playerId?: string): boolean {
-
-    game = (game) ? game : socket.game;
-    playerId = (playerId) ? playerId : socket.player;
-
-    if (!Games.gameExists(game)) {
-        createNewGame(game);
-    }
-
-    if (playerId === GenSpecId) {
-
-        Games.addSpectatorToGame(game);
-
-        socket.game = game;
-        socket.player = playerId;
-
-        socket.join(socket.game);
-        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
-
-    } else if (!Games.playerInGame(game, playerId)) {
-
-        Games.addPlayerToGame(game, playerId);
-
-        socket.game = game;
-        socket.player = playerId;
-
-        sendMessage(socket.game, `${socket.player} has joined the game`);
-
-        socket.join(socket.game);
-        socket.emit('joinGame', socket.game, socket.player, Games.games[socket.game].chatLog, Games.games[socket.game].board.board);
-    }
-
-    return;
-}
-
 function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
 
     game = (game) ? game : socket.game;
@@ -103,8 +68,6 @@ function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
 
     let playerId: string = Games.tryAddPlayerToGame(game);
 
-    console.log(`Join ${game} lobby attempt by ${playerId}`)
-
     if (playerId) {
 
         socket.game = game;
@@ -114,6 +77,7 @@ function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
 
         socket.join(socket.game);
         socket.emit('joinLobby', socket.game);
+        socket.emit('createPlayer', socket.player);
         socket.emit('updateChat', Games.games[socket.game].chatLog);
 
         console.log(`${socket.player} has joined the ${socket.game} lobby`);
@@ -164,7 +128,11 @@ function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: s
 
 }
 
-function readyUp(game: string, playerId: string): void {
+function readyUp(socket: SocketIO.Socket, game?: string, playerId?: string): void {
+
+    game = (game) ? game : socket.game;
+    playerId = (playerId) ? playerId : socket.player;
+
     if (Games.gameExists(game)) {
         Games.readyPlayerInGame(game, playerId);
         sendMessage(game, `${playerId} Ready!`);
@@ -189,6 +157,21 @@ function startGame(game: string): void {
     return;
 }
 
+function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelta, game?: string, playerId?: string): void {
+
+    game = (game) ? game : socket.game;
+    playerId = (playerId) ? playerId : socket.player;
+
+    if(Games.gameExists(game)){
+        Games.games[game].submitPlayerActions(playerId, data);
+        if(Games.games[game].allPlayerActionsSubmitted()) {
+            io.to(game).emit('update', Games.games[game].update());
+        }
+    }
+
+    return;
+}
+
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -205,14 +188,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
 
     socket.on('joinLobby', (game: string) => {
         if (game) {
-            console.log(`Attempt to join ${game} lobby`);
             addPlayerToLobby(socket, game);
-        }
-    });
-
-    socket.on('joinGame', (joinData: joinData) => {
-        if (isValidJoinData(joinData)) {
-            addPlayerToGame(socket, joinData.game, joinData.player);
         }
     });
 
@@ -226,7 +202,11 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('ready', () => {
-        readyUp(socket.game, socket.player);
+        readyUp(socket);
+    });
+
+    socket.on('submitActions', (data: Delta.FromClientDelta) => {
+        submitPlayerActions(socket, data);
     });
 
     socket.on('leaveGame', () => {
