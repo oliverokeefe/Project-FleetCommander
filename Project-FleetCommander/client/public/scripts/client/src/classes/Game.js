@@ -62,6 +62,20 @@ export class Game {
         return;
     }
     update(data) {
+        console.log(data);
+        //Need to handle
+        //movePhase
+        this.Scoreboard.setMovePhase(data.movePhase);
+        //moves
+        data.moves.forEach((move) => {
+            let shipGlobalId = Ship.Ship.globalId(move.playerId, move.shipClass, move.shipId);
+            if (this.Board.ships.has(shipGlobalId)) {
+                this.Board.ships.get(shipGlobalId).move(move.to);
+            }
+        });
+        //detroyed
+        //scores
+        //spawns
         this.Scoreboard.SubmitMoveBtn.disabled = false;
         return;
     }

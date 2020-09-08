@@ -33,3 +33,30 @@ KEY:
 +: section good for now
 
 
+
+Things to Do:
+1) Add battle movement
+    1) Ship not allowed to move if at 'disadvatage' (that needs defining)
+    2) If not at 'disadvatage' (tied or advantage) can move 1 in any direction
+    3) follow mechanic
+2) BattleCounters
+    -destroying ships
+3) Spawning ships
+4) How will I handle multiple ships on the same tile?
+    ?? Can limit to 9 ships per tile for now... this will have to due atm
+    -later- Black the tile, have a new tab on the side that has all
+      the ships in it... that will be better than limiting, but this
+    is going to be an issue with the choosen tools
+5) Scoring
+------Game now testPlayable
+
+-Game Over
+-Restart
+-Spectator
+
+
+
+
+
+
+

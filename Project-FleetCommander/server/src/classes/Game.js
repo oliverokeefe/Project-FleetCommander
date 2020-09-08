@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameList = exports.Game = exports.GameDelta = void 0;
 const Player_1 = require("./Player");
 const GameBoard_1 = require("./GameBoard");
+const Ships_1 = require("./Ships");
 /**
  * Send to cliet to update game
  *
@@ -15,6 +16,7 @@ class Game {
         this.name = name;
         this.board = new GameBoard_1.Board();
         this.playerCount = 0;
+        this.movePhase = Ships_1.Fleet.SHIPCLASSES.PAWN;
         this.playerIds = [
             "Player1",
             "Player2",
@@ -27,7 +29,7 @@ class Game {
     initPlayers() {
         this.players = new Map();
         this.playerIds.forEach((id) => {
-            this.players.set(id, new Player_1.Player(id, this.board.territories.get(id)));
+            this.players.set(id, new Player_1.Player(id, this.board.territories.get(id), this.board));
         });
         return;
     }
@@ -49,16 +51,14 @@ class Game {
     }
     initialShips() {
         let initialShips = [];
-        //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
-        //Then the const static data could be used here instead of constantly doing Object.keys()
         this.playerIds.forEach((playerId) => {
-            Object.keys(this.players.get(playerId).fleet.ships).forEach((shipClass) => {
-                Object.keys(this.players.get(playerId).fleet.ships[shipClass]).forEach((shipId) => {
+            this.players.get(playerId).fleet.ships.forEach((shipClass) => {
+                shipClass.forEach((ship) => {
                     initialShips.push({
-                        playerId: playerId,
-                        shipId: shipId,
-                        shipClass: shipClass,
-                        startLocation: this.players.get(playerId).fleet.ships[shipClass][shipId].position.coordinate
+                        playerId: ship.playerId,
+                        shipId: ship.id,
+                        shipClass: ship.shipClass,
+                        startLocation: ship.position.rowcol
                     });
                 });
             });
@@ -67,16 +67,16 @@ class Game {
     }
     initialScores() {
         let initialScores = [];
-        this.playerIds.forEach((playerId) => {
+        this.players.forEach((player) => {
             initialScores.push({
-                playerId: playerId,
-                score: 0
+                playerId: player.id,
+                score: player.score
             });
         });
         return initialScores;
     }
     initialMovePhase() {
-        return "pawn";
+        return this.movePhase;
     }
     update() {
         let data = {
@@ -87,29 +87,46 @@ class Game {
             movePhase: ""
         };
         for (let i = 0; i < 11; i++) {
-            this.playerIds.forEach((id) => {
-                if (this.players.has(id)) {
-                    this.players.get(id).incrementalUpdate();
-                }
+            this.players.forEach((player) => {
+                player.incrementalUpdate(this.board, this.movePhase);
             });
         }
-        this.playerIds.forEach((id) => {
-            if (this.players.has(id)) {
-                data.spawns = data.spawns.concat(this.players.get(id).updateData.spawns);
-                data.moves = data.moves.concat(this.players.get(id).updateData.moves);
-                data.destroyed = data.destroyed.concat(this.players.get(id).updateData.destroyed);
-                data.scores = data.scores.concat(this.players.get(id).updateData.scores);
-                data.movePhase = this.nextMovePhase();
+        this.players.forEach((player) => {
+            if (player.updateData) {
+                data.spawns = data.spawns.concat(player.updateData.spawns);
+                data.moves = data.moves.concat(player.updateData.moves);
+                data.destroyed = data.destroyed.concat(player.updateData.destroyed);
+                data.scores = data.scores.concat(player.updateData.scores);
+                player.updateData = undefined;
             }
         });
-        //-----This should be a useless call now...
-        this.clearAllPlayerActions();
-        //----
+        data.movePhase = this.nextMovePhase();
         return data;
     }
     nextMovePhase() {
-        //move the move phase forward and return the new phase;
-        return;
+        switch (this.movePhase) {
+            case (Ships_1.Fleet.SHIPCLASSES.PAWN): {
+                this.movePhase = Ships_1.Fleet.SHIPCLASSES.KNIGHT;
+                break;
+            }
+            case (Ships_1.Fleet.SHIPCLASSES.KNIGHT): {
+                this.movePhase = Ships_1.Fleet.SHIPCLASSES.COMMAND;
+                break;
+            }
+            case (Ships_1.Fleet.SHIPCLASSES.COMMAND): {
+                this.movePhase = Ships_1.Fleet.SHIPCLASSES.FLAGSHIP;
+                break;
+            }
+            case (Ships_1.Fleet.SHIPCLASSES.FLAGSHIP): {
+                this.movePhase = Ships_1.Fleet.SHIPCLASSES.PAWN;
+                break;
+            }
+            default: {
+                this.movePhase = "ERROR";
+                break;
+            }
+        }
+        return this.movePhase;
     }
     addPlayer(id, name) {
         this.players.get(id).connected = true;

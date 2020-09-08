@@ -112,14 +112,13 @@ function startGame(game) {
 function submitPlayerActions(socket, data, game, playerId) {
     game = (game) ? game : socket.game;
     playerId = (playerId) ? playerId : socket.player;
-    /*
-        if(Games.gameExists(game)){
-            Games.games[game].submitPlayerActions(playerId, data);
-            if(Games.games[game].allPlayerActionsSubmitted()) {
-                io.to(game).emit('update', Games.games[game].update());
-            }
+    console.log(`${playerId} submited data`);
+    if (Games.gameExists(game)) {
+        Games.games[game].submitPlayerActions(playerId, data);
+        if (Games.games[game].allPlayerActionsSubmitted()) {
+            io.to(game).emit('update', Games.games[game].update());
         }
-    */
+    }
     return;
 }
 ///++++++++++++++++++++++++++++++++++++++++++++++++++

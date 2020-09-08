@@ -5,12 +5,12 @@ exports.Board = exports.Territory = exports.Tile = void 0;
 // TODO Make a seperate server and client game board... this cannot be in shared...
 ///--------------------------------------------------
 class Tile {
-    constructor(coordinate, value, cluster) {
-        this.coordinate = coordinate;
+    constructor(rowcol, value, cluster) {
+        this.rowcol = rowcol;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;
         this.territory = "";
-        this.ships = new Set();
+        this.ships = new Map();
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
@@ -31,10 +31,11 @@ exports.Territory = Territory;
 class Board {
     constructor() {
         this.board = undefined;
+        this.ships = new Map();
         this.createBoard();
         this.createTerritories();
     }
-    static validCoordinate(coordinate) {
+    validCoordinate(coordinate) {
         //Check if the coordinate exists on the game board
         return (coordinate[0] >= 0 && coordinate[1] >= 0 && coordinate[0] < 11 && coordinate[1] < 11);
     }
@@ -215,7 +216,7 @@ class Board {
         return;
     }
     getTile(coordinate) {
-        if (this.board && Board.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
+        if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
             return this.board[coordinate[0]][coordinate[1]];
         }
         else {

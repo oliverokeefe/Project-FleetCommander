@@ -1,5 +1,4 @@
 import { Game } from './MainModel.js';
-import { Board } from './GameBoard.js';
 export class ShipList {
     constructor() {
         this.ships = {};
@@ -17,7 +16,7 @@ export class ShipList {
     }
 }
 export class Ship {
-    constructor(id, player, spawnPosition) {
+    constructor(id, player, spawnPosition, shipClass) {
         this.id = id;
         this.playerId = player;
         this.displayElement = undefined;
@@ -26,6 +25,9 @@ export class Ship {
         this.battleCounter = 0;
         this.moveDelta = undefined;
         this.shadow = new Shadow(this);
+        this.shipClass = shipClass;
+        this.globalId = Ship.globalId(this.playerId, this.shipClass, this.id);
+        this.initShip();
     }
     static globalId(playerId, shipClass, shipId) {
         return `${playerId}:${shipClass}:${shipId}`;
@@ -85,7 +87,7 @@ export class Ship {
                             this.position.rowcol[0] + rowMod,
                             this.position.rowcol[1] + colMod
                         ];
-                        if (Board.validCoordinate(curCoord)) {
+                        if (Game.Board.validCoordinate(curCoord)) {
                             Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
                         }
                     }
@@ -104,25 +106,6 @@ export class Ship {
     shadowMove() {
         return;
     }
-    move(tile) {
-        if (this.validMove(tile.rowcol)) {
-            this.position = tile;
-        }
-        return this.position;
-    }
-    validMove(coordinate) {
-        return Board.validCoordinate(coordinate) && this.shipCanReach(coordinate);
-    }
-    shipCanReach(coordinate) {
-        ///Somewhere in here should check if ship is being blocked
-        if ((this.position.rowcol[0] - 1 <= coordinate[0] && coordinate[0] <= this.position.rowcol[0] + 1) &&
-            (this.position.rowcol[1] - 1 <= coordinate[1] && coordinate[1] <= this.position.rowcol[1] + 1)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
     getPossibleMoves() {
         let viableMoves = [];
         if (this.position) {
@@ -133,7 +116,7 @@ export class Ship {
                             this.position.rowcol[0] + rowMod,
                             this.position.rowcol[1] + colMod
                         ];
-                        if (Board.validCoordinate(curCoord)) {
+                        if (Game.Board.validCoordinate(curCoord)) {
                             viableMoves.push(curCoord);
                         }
                     }
@@ -144,14 +127,15 @@ export class Ship {
     }
     placeShipOnTile(tile) {
         this.removeShipFromBoard();
-        tile.ships.add(this.globalId);
+        tile.ships.get(this.shipClass).set(this.globalId, this);
         this.position = tile;
         tile.displayElement.appendChild(this.displayElement);
         return;
     }
     removeShipFromBoard() {
         if (this.position) {
-            this.position.ships.delete(this.globalId);
+            this.shadow.removeShadowFromBoard();
+            this.position.ships.get(this.shipClass).delete(this.globalId);
             this.position.displayElement.removeChild(this.displayElement);
             this.position = undefined;
         }
@@ -159,6 +143,19 @@ export class Ship {
     }
     spawnShip() {
         this.placeShipOnTile(this.spawn);
+        return;
+    }
+    /**
+     * Only use to handle server updates. This will move the ship without any safety checks.
+     * @param to coordinate of tile to move to
+     */
+    move(to) {
+        //need to unstage the ship, clear any previous move data, and move the ship
+        this.unstage();
+        let target = Game.Board.getTile(to);
+        if (target) {
+            this.placeShipOnTile(target);
+        }
         return;
     }
 }
@@ -170,18 +167,12 @@ Ship.SHIPCLASSES = {
 };
 export class Pawn extends Ship {
     constructor(id, player, spawnPosition) {
-        super(id, player, spawnPosition);
-        this.shipClass = Ship.SHIPCLASSES.PAWN;
-        this.globalId = Ship.globalId(this.playerId, this.shipClass, this.id);
-        this.initShip();
+        super(id, player, spawnPosition, Ship.SHIPCLASSES.PAWN);
     }
 }
 export class Knight extends Ship {
     constructor(id, player, spawnPosition) {
-        super(id, player, spawnPosition);
-        this.shipClass = Ship.SHIPCLASSES.KNIGHT;
-        this.globalId = Ship.globalId(this.playerId, this.shipClass, this.id);
-        this.initShip();
+        super(id, player, spawnPosition, Ship.SHIPCLASSES.KNIGHT);
     }
     suggestMoves() {
         console.log("Suggest Moves??");
@@ -201,7 +192,7 @@ export class Knight extends Ship {
                     this.position.rowcol[0] + mod[0],
                     this.position.rowcol[1] + mod[1]
                 ];
-                if (Board.validCoordinate(curCoord)) {
+                if (Game.Board.validCoordinate(curCoord)) {
                     Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
                 }
             });
@@ -210,19 +201,62 @@ export class Knight extends Ship {
     }
 }
 export class Command extends Ship {
-    constructor(id, player, spawnPosition) {
-        super(id, player, spawnPosition);
-        this.shipClass = Ship.SHIPCLASSES.COMMAND;
-        this.globalId = Ship.globalId(this.playerId, this.shipClass, this.id);
-        this.initShip();
+    /**
+     * Initializes a Command Ship and places it on the board at the supplied spawn
+     * **Note, do not use the flagShip constructor variable. It is meant only for
+     * use by the FlagShip constructor
+     * @param id ID of the ship
+     * @param player ID if the player owner of this ship
+     * @param spawnPosition tile that acts as this ships spawn
+     * @param flagShip Only use in the FlagShip constructor. Used to set the shipClass to FlagShip
+     */
+    constructor(id, player, spawnPosition, flagShip) {
+        let shipClass = (flagShip) ? Ship.SHIPCLASSES.FLAGSHIP : Ship.SHIPCLASSES.COMMAND;
+        super(id, player, spawnPosition, shipClass);
+    }
+    suggestMoves() {
+        console.log("Suggest Moves??");
+        if (this.position) {
+            let directions = [
+                [-1, 0],
+                [-1, 1],
+                [0, 1],
+                [1, 1],
+                [1, 0],
+                [1, -1],
+                [0, -1],
+                [-1, -1]
+            ];
+            directions.forEach((vector) => {
+                let blocked = false;
+                for (let mag = 1; mag <= 11; mag++) {
+                    let curCoord = [
+                        this.position.rowcol[0] + vector[0] * mag,
+                        this.position.rowcol[1] + vector[1] * mag
+                    ];
+                    let target = Game.Board.getTile(curCoord);
+                    if (target && !blocked) {
+                        Game.Board.suggestTile(target);
+                        blocked = this.tileHasDifferentShips(target);
+                    }
+                }
+            });
+        }
+        return;
+    }
+    tileHasDifferentShips(target) {
+        let hasOtherShips = false;
+        target.ships.forEach((ships, shipClass) => {
+            if (shipClass !== this.shipClass && ships.size > 0) {
+                hasOtherShips = true;
+            }
+        });
+        return hasOtherShips;
     }
 }
-export class Flagship extends Ship {
+export class Flagship extends Command {
     constructor(id, player, spawnPosition) {
-        super(id, player, spawnPosition);
-        this.shipClass = Ship.SHIPCLASSES.FLAGSHIP;
-        this.globalId = Ship.globalId(this.playerId, this.shipClass, this.id);
-        this.initShip();
+        super(id, player, spawnPosition, Ship.SHIPCLASSES.FLAGSHIP);
     }
 }
 export class Shadow {

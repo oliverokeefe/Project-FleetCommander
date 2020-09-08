@@ -1,6 +1,6 @@
 import { socket, Game } from './MainModel.js';
 import { coordinate } from "../../../shared/src/types/types";
-import { Ship } from "./Ships.js";
+import { Ship, Pawn, Knight, Command, Flagship } from "./Ships.js";
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 
@@ -15,13 +15,17 @@ export class Tile {
 
     public displayElement: HTMLDivElement;
     public rowcol: coordinate;
-    public ships: Set<string>;
+    public ships: Map<string, Map<string, Ship>>;
     public stagedShips: Map<string, Ship>;
 
     constructor(display: HTMLDivElement, rowcol: coordinate) {
         this.displayElement = display;
         this.rowcol = rowcol;
-        this.ships = new Set<string>();
+        this.ships = new Map<string, Map<string, Ship>>();
+        this.ships.set(Ship.SHIPCLASSES.PAWN, new Map<string, Pawn>());
+        this.ships.set(Ship.SHIPCLASSES.KNIGHT, new Map<string, Knight>());
+        this.ships.set(Ship.SHIPCLASSES.COMMAND, new Map<string, Command>());
+        this.ships.set(Ship.SHIPCLASSES.FLAGSHIP, new Map<string, Flagship>());
         this.stagedShips = new Map<string, Ship>();
 
         this.setUpSocket();
@@ -64,6 +68,7 @@ export class Tile {
         ship.moveDelta = {
             playerId: ship.playerId,
             shipId: ship.id,
+            shipClass: ship.shipClass,
             from: ship.position.rowcol,
             to: this.rowcol
         };
@@ -119,7 +124,7 @@ export class Board {
         return;
     }
 
-    public static validCoordinate(coordinate: coordinate): boolean {
+    public validCoordinate(coordinate: coordinate): boolean {
         //Check if the coordinate exists on the game board
 
         return (0 <= coordinate[0] && coordinate[0] <= Board.MAXROW && 0 <= coordinate[1] && coordinate[1] <= Board.MAXCOL);
@@ -183,6 +188,14 @@ export class Board {
         });
         this.suggestedTiles = [];
         return;
+    }
+
+    public getTile(coordinate: coordinate): Tile {
+        let target: Tile = undefined
+        if(this.validCoordinate(coordinate) && this.tiles[coordinate[0]]){
+            target = this.tiles[coordinate[0]][coordinate[1]];
+        }
+        return target;
     }
 
 }

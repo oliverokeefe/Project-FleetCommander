@@ -1,5 +1,6 @@
 import { coordinate } from "../../../shared/src/types/types";
 import { stringify } from "querystring";
+import { Ship } from "./Ships";
 
 type board = Array<Array<Tile>>;
 ///--------------------------------------------------
@@ -11,24 +12,24 @@ export class Tile {
 
     //public displayDiv: HTMLDivElement;
 
-    public coordinate: coordinate;
+    public rowcol: coordinate;
     public value: number;
     public cluster: number;
 
     public territory: string;
-    public ships: Set<string>;
+    public ships: Map<string, Ship>;
     public ship: string
     public isSpawn: boolean;
     public canBuildOn: boolean;
 
 
-    constructor(coordinate: coordinate, value?: number, cluster?: number) {
-        this.coordinate = coordinate;
+    constructor(rowcol: coordinate, value?: number, cluster?: number) {
+        this.rowcol = rowcol;
         this.value = (value) ? value : 0;
         this.cluster = (cluster) ? cluster : 0;
 
         this.territory = "";
-        this.ships = new Set<string>();
+        this.ships = new Map<string, Ship>();
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
@@ -68,13 +69,16 @@ export class Board {
 
     public territories: Map<string, Territory>;
 
+    public ships: Map<string, Ship>;
+
     constructor() {
         this.board = undefined;
+        this.ships = new Map<string, Ship>();
         this.createBoard();
         this.createTerritories();
     }
 
-    public static validCoordinate(coordinate: coordinate): boolean {
+    public validCoordinate(coordinate: coordinate): boolean {
         //Check if the coordinate exists on the game board
 
         return (coordinate[0] >= 0 && coordinate[1] >= 0 && coordinate[0] < 11 && coordinate[1] < 11);
@@ -265,7 +269,7 @@ export class Board {
 
 
     public getTile(coordinate: coordinate): Tile {
-        if (this.board && Board.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
+        if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
             return this.board[coordinate[0]][coordinate[1]];
         } else {
             return undefined;

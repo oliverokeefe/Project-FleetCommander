@@ -162,6 +162,7 @@ function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelt
     game = (game) ? game : socket.game;
     playerId = (playerId) ? playerId : socket.player;
 
+    console.log(`${playerId} submited data`);
     if(Games.gameExists(game)){
         Games.games[game].submitPlayerActions(playerId, data);
         if(Games.games[game].allPlayerActionsSubmitted()) {

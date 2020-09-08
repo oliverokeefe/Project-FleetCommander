@@ -2,6 +2,7 @@ import * as Ship from "./Ships.js";
 
 
 import { socket, Game } from './MainModel.js';
+import { coordinate } from "../../../shared/src/types/types.js";
 
 /*
  * 
@@ -49,6 +50,19 @@ export class Player {
         return;
     }
 
+    public hasShipAt(rowcol: coordinate): boolean {
+        let hasShipAtRowCol: boolean = false;
+        this.ships.forEach((shipClass) => {
+            shipClass.forEach((ship) => {
+                if(ship.position &&
+                    ship.position.rowcol[0] === rowcol[0] &&
+                    ship.position.rowcol[1] === rowcol[1]) {
+                        hasShipAtRowCol = true;
+                }
+            });
+        });
+        return hasShipAtRowCol;
+    }
 }
 
 

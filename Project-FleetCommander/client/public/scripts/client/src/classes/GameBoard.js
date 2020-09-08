@@ -1,9 +1,14 @@
 import { Game } from './MainModel.js';
+import { Ship } from "./Ships.js";
 export class Tile {
     constructor(display, rowcol) {
         this.displayElement = display;
         this.rowcol = rowcol;
-        this.ships = new Set();
+        this.ships = new Map();
+        this.ships.set(Ship.SHIPCLASSES.PAWN, new Map());
+        this.ships.set(Ship.SHIPCLASSES.KNIGHT, new Map());
+        this.ships.set(Ship.SHIPCLASSES.COMMAND, new Map());
+        this.ships.set(Ship.SHIPCLASSES.FLAGSHIP, new Map());
         this.stagedShips = new Map();
         this.setUpSocket();
         this.addEventHandlers();
@@ -39,6 +44,7 @@ export class Tile {
         ship.moveDelta = {
             playerId: ship.playerId,
             shipId: ship.id,
+            shipClass: ship.shipClass,
             from: ship.position.rowcol,
             to: this.rowcol
         };
@@ -79,7 +85,7 @@ export class Board {
         this.createBlankBoard();
         return;
     }
-    static validCoordinate(coordinate) {
+    validCoordinate(coordinate) {
         //Check if the coordinate exists on the game board
         return (0 <= coordinate[0] && coordinate[0] <= Board.MAXROW && 0 <= coordinate[1] && coordinate[1] <= Board.MAXCOL);
     }
@@ -131,6 +137,13 @@ export class Board {
         });
         this.suggestedTiles = [];
         return;
+    }
+    getTile(coordinate) {
+        let target = undefined;
+        if (this.validCoordinate(coordinate) && this.tiles[coordinate[0]]) {
+            target = this.tiles[coordinate[0]][coordinate[1]];
+        }
+        return target;
     }
 }
 Board.MAXROW = 10;

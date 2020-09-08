@@ -15,6 +15,7 @@ export interface SpawnDelta {
 
 export interface MoveDelta {
     playerId: string;
+    shipClass: string;
     shipId: string;
     from: coordinate;
     to: coordinate;

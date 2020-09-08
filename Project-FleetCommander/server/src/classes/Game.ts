@@ -1,7 +1,7 @@
 import { Player } from "./Player";
 import { Board } from "./GameBoard";
 import * as Delta from '../../../shared/src/classes/GameDelta';
-import { Ship } from "./Ships";
+import { Ship, Fleet } from "./Ships";
 
 /**
  * Send to cliet to update game
@@ -20,12 +20,14 @@ export class Game {
     public playerCount: number;
     public playerIds: string[];
     public players: Map<string, Player>;
+    public movePhase: string;
     public chatLog: string[];
 
     constructor(name: string) {
         this.name = name;
         this.board = new Board();
         this.playerCount = 0;
+        this.movePhase = Fleet.SHIPCLASSES.PAWN;
         this.playerIds = [
             "Player1",
             "Player2",
@@ -39,7 +41,7 @@ export class Game {
     private initPlayers(): void {
         this.players = new Map<string, Player>();
         this.playerIds.forEach((id) => {
-            this.players.set(id, new Player(id, this.board.territories.get(id)));
+            this.players.set(id, new Player(id, this.board.territories.get(id), this.board));
         });
         return;
     }
@@ -67,37 +69,34 @@ export class Game {
 
     private initialShips(): Delta.ShipData[] {
         let initialShips: Delta.ShipData[] = [];
-        //At some point I need like a static game config class that has the playerId's, shipClasses, and shipId's
-        //Then the const static data could be used here instead of constantly doing Object.keys()
         this.playerIds.forEach((playerId) => {
-            Object.keys(this.players.get(playerId).fleet.ships).forEach((shipClass) => {
-                Object.keys(this.players.get(playerId).fleet.ships[shipClass]).forEach((shipId) => {
+            this.players.get(playerId).fleet.ships.forEach((shipClass) => {
+                shipClass.forEach((ship) => {
                     initialShips.push({
-                        playerId: playerId,
-                        shipId: shipId,
-                        shipClass: shipClass,
-                        startLocation: (this.players.get(playerId).fleet.ships[shipClass][shipId] as Ship).position.coordinate
+                        playerId: ship.playerId,
+                        shipId: ship.id,
+                        shipClass: ship.shipClass,
+                        startLocation: ship.position.rowcol                        
                     });
                 });
             });
         });
-
         return initialShips;
     }
 
     private initialScores(): Delta.ScoreDelta[] {
         let initialScores: Delta.ScoreDelta[] = [];
-        this.playerIds.forEach((playerId: string) => {
+        this.players.forEach((player) => {
             initialScores.push({
-                playerId: playerId,
-                score: 0
-            });
+                playerId: player.id,
+                score: player.score
+            });            
         });
         return initialScores;
     }
 
     private initialMovePhase(): string {
-        return "pawn";
+        return this.movePhase;
     }
 
     public update(): Delta.ToClientDelta {
@@ -108,35 +107,48 @@ export class Game {
             scores: [],
             movePhase: ""
         };
-
         for(let i=0; i<11; i++) {
-            this.playerIds.forEach((id) => {
-                if(this.players.has(id)) {
-                    this.players.get(id).incrementalUpdate();
-                }
+            this.players.forEach((player) => {
+                player.incrementalUpdate(this.board, this.movePhase);
             });
         }
-
-        this.playerIds.forEach((id) => {
-            if(this.players.has(id)) {
-                data.spawns = data.spawns.concat(this.players.get(id).updateData.spawns);
-                data.moves = data.moves.concat(this.players.get(id).updateData.moves);
-                data.destroyed = data.destroyed.concat(this.players.get(id).updateData.destroyed);
-                data.scores = data.scores.concat(this.players.get(id).updateData.scores);
-                data.movePhase = this.nextMovePhase();
+        this.players.forEach((player) => {
+            if(player.updateData){
+                data.spawns = data.spawns.concat(player.updateData.spawns);
+                data.moves = data.moves.concat(player.updateData.moves);
+                data.destroyed = data.destroyed.concat(player.updateData.destroyed);
+                data.scores = data.scores.concat(player.updateData.scores);
+                player.updateData = undefined;
             }
         });
-
-        //-----This should be a useless call now...
-        this.clearAllPlayerActions();
-        //----
-
+        data.movePhase = this.nextMovePhase();
         return data;
     }
 
     private nextMovePhase(): string {
-        //move the move phase forward and return the new phase;
-        return;
+        switch(this.movePhase){
+            case(Fleet.SHIPCLASSES.PAWN): {
+                this.movePhase = Fleet.SHIPCLASSES.KNIGHT;
+                break;
+            }
+            case(Fleet.SHIPCLASSES.KNIGHT): {
+                this.movePhase = Fleet.SHIPCLASSES.COMMAND;
+                break;
+            }
+            case(Fleet.SHIPCLASSES.COMMAND): {
+                this.movePhase = Fleet.SHIPCLASSES.FLAGSHIP;
+                break;
+            }
+            case(Fleet.SHIPCLASSES.FLAGSHIP): {
+                this.movePhase = Fleet.SHIPCLASSES.PAWN;
+                break;
+            }
+            default: {
+                this.movePhase = "ERROR";
+                break;
+            }
+        }
+        return this.movePhase;
     }
 
     private addPlayer(id: string, name?: string): void {
