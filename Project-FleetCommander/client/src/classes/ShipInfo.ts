@@ -11,7 +11,7 @@ export class ShipInfo {
     public PlayerId: HTMLDivElement;
     public ShipId: HTMLDivElement;
     public ShipClass: HTMLDivElement;
-    public ShipBC: HTMLDivElement;
+    public ShipSupply: HTMLDivElement;
     public ShipFrom: HTMLDivElement;
     public ShipTo: HTMLDivElement;
 
@@ -21,7 +21,7 @@ export class ShipInfo {
         this.PlayerId = document.getElementById("PlayerId") as HTMLDivElement;
         this.ShipId = document.getElementById("ShipId") as HTMLDivElement;
         this.ShipClass = document.getElementById("ShipClass") as HTMLDivElement;
-        this.ShipBC = document.getElementById("ShipBC") as HTMLDivElement;
+        this.ShipSupply = document.getElementById("ShipSupply") as HTMLDivElement;
         this.ShipFrom = document.getElementById("ShipFrom") as HTMLDivElement;
         this.ShipTo = document.getElementById("ShipTo") as HTMLDivElement;
         
@@ -44,7 +44,7 @@ export class ShipInfo {
         this.PlayerId.innerText = `Player ID: ${ship.playerId}`;
         this.ShipId.innerText = `Ship ID: ${ship.id}`;
         this.ShipClass.innerText = `Ship Class: ${ship.shipClass}`;
-        this.ShipBC.innerText = `Battle Counter: ${ship.battleCounter}`;
+        this.ShipSupply.innerText = `Supply: ${ship.supply}`;
         this.ShipFrom.innerText = (ship.position) ? `From: ${ship.position.rowcol}` : `From: `;
         this.ShipTo.innerText = (ship.shadow.position) ? `To: ${ship.shadow.position.rowcol}` : `To: `;
 

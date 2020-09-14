@@ -22,7 +22,7 @@ export class Ship {
         this.displayElement = undefined;
         this.position = undefined;
         this.spawn = spawnPosition;
-        this.battleCounter = 0;
+        this.supply = 0;
         this.moveDelta = undefined;
         this.shadow = new Shadow(this);
         this.shipClass = shipClass;
@@ -71,31 +71,25 @@ export class Ship {
         }
         if (this.playerId === Game.Player.id && this.shipClass === Game.movePhase && this.globalId !== lastSelectedShip) {
             this.unstage();
+            Game.selectedShip = this;
             if (this.position) {
-                Game.selectedShip = this;
-                this.suggestMoves();
-            }
-        }
-        return;
-    }
-    suggestMoves() {
-        if (this.position) {
-            for (let rowMod = -1; rowMod <= 1; rowMod++) {
-                for (let colMod = -1; colMod <= 1; colMod++) {
-                    if (!(rowMod === 0 && colMod === 0)) {
-                        let curCoord = [
-                            this.position.rowcol[0] + rowMod,
-                            this.position.rowcol[1] + colMod
-                        ];
-                        if (Game.Board.validCoordinate(curCoord)) {
-                            Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
-                        }
-                    }
+                let battleState = this.position.getBattleState(this.playerId);
+                console.log(battleState);
+                if (!battleState.hasEnemeyShips) {
+                    this.suggestMoves();
+                }
+                else if (battleState.shipDiff > -3) {
+                    this.suggestBattleMoves();
+                }
+                else {
+                    //ship cannot move... do nothing??
                 }
             }
         }
         return;
     }
+    suggestBattleMoves() { Movement.suggestBasicMoves(this); }
+    suggestMoves() { Movement.suggestBasicMoves(this); }
     unstage() {
         if (this.shadow.position) {
             this.shadow.position.removeStagedShip(this);
@@ -105,25 +99,6 @@ export class Ship {
     }
     shadowMove() {
         return;
-    }
-    getPossibleMoves() {
-        let viableMoves = [];
-        if (this.position) {
-            for (let rowMod = -1; rowMod <= 1; rowMod++) {
-                for (let colMod = -1; colMod <= 1; colMod++) {
-                    if (!(rowMod === 0 && colMod === 0)) {
-                        let curCoord = [
-                            this.position.rowcol[0] + rowMod,
-                            this.position.rowcol[1] + colMod
-                        ];
-                        if (Game.Board.validCoordinate(curCoord)) {
-                            viableMoves.push(curCoord);
-                        }
-                    }
-                }
-            }
-        }
-        return viableMoves;
     }
     placeShipOnTile(tile) {
         this.removeShipFromBoard();
@@ -158,6 +133,15 @@ export class Ship {
         }
         return;
     }
+    tileHasDifferentShips(target) {
+        let hasOtherShips = false;
+        target.ships.forEach((ships, shipClass) => {
+            if (shipClass !== this.shipClass && ships.size > 0) {
+                hasOtherShips = true;
+            }
+        });
+        return hasOtherShips;
+    }
 }
 Ship.SHIPCLASSES = {
     PAWN: "pawn",
@@ -174,90 +158,19 @@ export class Knight extends Ship {
     constructor(id, player, spawnPosition) {
         super(id, player, spawnPosition, Ship.SHIPCLASSES.KNIGHT);
     }
-    suggestMoves() {
-        console.log("Suggest Moves??");
-        if (this.position) {
-            let range = [
-                [-2, -1],
-                [-2, 1],
-                [-1, -2],
-                [-1, 2],
-                [1, -2],
-                [1, 2],
-                [2, -1],
-                [2, 1],
-            ];
-            range.forEach((mod) => {
-                let curCoord = [
-                    this.position.rowcol[0] + mod[0],
-                    this.position.rowcol[1] + mod[1]
-                ];
-                if (Game.Board.validCoordinate(curCoord)) {
-                    Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
-                }
-            });
-        }
-        return;
-    }
+    suggestMoves() { Movement.suggestKnightMoves(this); }
 }
 export class Command extends Ship {
-    /**
-     * Initializes a Command Ship and places it on the board at the supplied spawn
-     * **Note, do not use the flagShip constructor variable. It is meant only for
-     * use by the FlagShip constructor
-     * @param id ID of the ship
-     * @param player ID if the player owner of this ship
-     * @param spawnPosition tile that acts as this ships spawn
-     * @param flagShip Only use in the FlagShip constructor. Used to set the shipClass to FlagShip
-     */
-    constructor(id, player, spawnPosition, flagShip) {
-        let shipClass = (flagShip) ? Ship.SHIPCLASSES.FLAGSHIP : Ship.SHIPCLASSES.COMMAND;
-        super(id, player, spawnPosition, shipClass);
+    constructor(id, player, spawnPosition) {
+        super(id, player, spawnPosition, Ship.SHIPCLASSES.COMMAND);
     }
-    suggestMoves() {
-        console.log("Suggest Moves??");
-        if (this.position) {
-            let directions = [
-                [-1, 0],
-                [-1, 1],
-                [0, 1],
-                [1, 1],
-                [1, 0],
-                [1, -1],
-                [0, -1],
-                [-1, -1]
-            ];
-            directions.forEach((vector) => {
-                let blocked = false;
-                for (let mag = 1; mag <= 11; mag++) {
-                    let curCoord = [
-                        this.position.rowcol[0] + vector[0] * mag,
-                        this.position.rowcol[1] + vector[1] * mag
-                    ];
-                    let target = Game.Board.getTile(curCoord);
-                    if (target && !blocked) {
-                        Game.Board.suggestTile(target);
-                        blocked = this.tileHasDifferentShips(target);
-                    }
-                }
-            });
-        }
-        return;
-    }
-    tileHasDifferentShips(target) {
-        let hasOtherShips = false;
-        target.ships.forEach((ships, shipClass) => {
-            if (shipClass !== this.shipClass && ships.size > 0) {
-                hasOtherShips = true;
-            }
-        });
-        return hasOtherShips;
-    }
+    suggestMoves() { Movement.suggestQueenMoves(this); }
 }
-export class Flagship extends Command {
+export class Flagship extends Ship {
     constructor(id, player, spawnPosition) {
         super(id, player, spawnPosition, Ship.SHIPCLASSES.FLAGSHIP);
     }
+    suggestMoves() { Movement.suggestQueenMoves(this); }
 }
 export class Shadow {
     constructor(owner) {
@@ -308,6 +221,80 @@ export class Shadow {
         if (this.position) {
             this.position.displayElement.removeChild(this.displayElement);
             this.position = undefined;
+        }
+        return;
+    }
+}
+export class Movement {
+    static suggestBasicMoves(ship) {
+        if (ship.position) {
+            for (let rowMod = -1; rowMod <= 1; rowMod++) {
+                for (let colMod = -1; colMod <= 1; colMod++) {
+                    if (!(rowMod === 0 && colMod === 0)) {
+                        let curCoord = [
+                            ship.position.rowcol[0] + rowMod,
+                            ship.position.rowcol[1] + colMod
+                        ];
+                        if (Game.Board.validCoordinate(curCoord)) {
+                            Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
+                        }
+                    }
+                }
+            }
+        }
+        return;
+    }
+    static suggestKnightMoves(ship) {
+        if (ship.position) {
+            let range = [
+                [-2, -1],
+                [-2, 1],
+                [-1, -2],
+                [-1, 2],
+                [1, -2],
+                [1, 2],
+                [2, -1],
+                [2, 1],
+            ];
+            range.forEach((mod) => {
+                let curCoord = [
+                    ship.position.rowcol[0] + mod[0],
+                    ship.position.rowcol[1] + mod[1]
+                ];
+                if (Game.Board.validCoordinate(curCoord)) {
+                    Game.Board.suggestTile(Game.Board.tiles[curCoord[0]][curCoord[1]]);
+                }
+            });
+            Movement.suggestBasicMoves(ship);
+        }
+        return;
+    }
+    static suggestQueenMoves(ship) {
+        if (ship.position) {
+            let directions = [
+                [-1, 0],
+                [-1, 1],
+                [0, 1],
+                [1, 1],
+                [1, 0],
+                [1, -1],
+                [0, -1],
+                [-1, -1]
+            ];
+            directions.forEach((vector) => {
+                let blocked = false;
+                for (let mag = 1; mag <= 11; mag++) {
+                    let curCoord = [
+                        ship.position.rowcol[0] + vector[0] * mag,
+                        ship.position.rowcol[1] + vector[1] * mag
+                    ];
+                    let target = Game.Board.getTile(curCoord);
+                    if (target && !blocked) {
+                        Game.Board.suggestTile(target);
+                        blocked = ship.tileHasDifferentShips(target);
+                    }
+                }
+            });
         }
         return;
     }

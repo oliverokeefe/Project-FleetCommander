@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = exports.Fleet = exports.ShipList = void 0;
+exports.Movement = exports.Flagship = exports.Command = exports.Knight = exports.Pawn = exports.Ship = exports.Fleet = exports.ShipList = void 0;
 class ShipList {
     constructor() {
         this.ships = {};
@@ -94,6 +94,9 @@ class Ship {
     static globalId(playerId, shipClass, shipId) {
         return `${playerId}:${shipClass}:${shipId}`;
     }
+    static getPlayerFromGlobalId(globalId) {
+        return globalId.split(":")[0];
+    }
     placeShipOnTile(tile) {
         this.removeShipFromBoard();
         tile.ships.set(this.globalId, this);
@@ -109,14 +112,24 @@ class Ship {
     }
     move(board, from, to) {
         let moveFinished = true;
-        if ((this.position.rowcol[0] !== to[0] || this.position.rowcol[1] !== to[1]) &&
-            (board.validCoordinate(to) && this.canReach(to))) {
-            let target = this.step(board, from, to);
-            if (target) {
-                this.placeShipOnTile(target);
-                this.updateDelta(from);
-                if (this.position.rowcol[0] !== to[0] || this.position.rowcol[1] !== to[1]) {
-                    moveFinished = false;
+        if (this.position) {
+            let canReach = false;
+            let battleState = this.position.getBattleState(this.playerId);
+            if (!battleState.hasEnemeyShips) {
+                canReach = this.canReach(to);
+            }
+            else {
+                canReach = this.battleReach(to);
+            }
+            if (!(this.position.rowcol[0] === to[0] && this.position.rowcol[1] === to[1]) &&
+                (board.validCoordinate(to) && battleState.shipDiff > -3 && canReach)) {
+                let target = this.step(board, from, to);
+                if (target) {
+                    this.placeShipOnTile(target);
+                    this.updateDelta(from);
+                    if (this.position.rowcol[0] !== to[0] || this.position.rowcol[1] !== to[1]) {
+                        moveFinished = false;
+                    }
                 }
             }
         }
@@ -125,10 +138,12 @@ class Ship {
     updateDelta(from) {
         if (!this.moveDelta) {
             this.moveDelta = {
-                playerId: this.playerId,
-                shipClass: this.shipClass,
-                shipId: this.id,
-                from: from,
+                ship: {
+                    playerId: this.playerId,
+                    shipClass: this.shipClass,
+                    shipId: this.id,
+                    position: from
+                },
                 to: this.position.rowcol
             };
         }
@@ -137,14 +152,10 @@ class Ship {
         }
         return;
     }
-    step(board, from, to) {
-        let target = board.getTile(to);
-        return target;
-    }
-    canReach(to) {
-        let vector = [to[0] - this.position.rowcol[0], to[1] - this.position.rowcol[1]];
-        return ((-1 <= vector[0] && vector[0] <= 1) && (-1 <= vector[1] && vector[1] <= 1));
-    }
+    step(board, from, to) { return Movement.step(board, to); }
+    canReach(to) { return Movement.canReach(this, to); }
+    battleStep(board, from, to) { return Movement.step(board, to); }
+    battleReach(to) { return Movement.canReach(this, to); }
     spawnShip() {
         this.placeShipOnTile(this.spawn);
         return;
@@ -175,20 +186,33 @@ class Knight extends Ship {
         super(id, player, spawn, Fleet.SHIPCLASSES.KNIGHT);
         this.value = 2;
     }
-    canReach(to) {
-        let vector = [to[0] - this.position.rowcol[0], to[1] - this.position.rowcol[1]];
-        return ((-2 === vector[0] || vector[0] === 2) && (-1 === vector[1] || vector[1] === 1)) ||
-            ((-1 === vector[0] || vector[0] === 1) && (-2 === vector[1] || vector[1] === 2));
-    }
+    canReach(to) { return Movement.knightCanReach(this, to); }
 }
 exports.Knight = Knight;
 class Command extends Ship {
-    constructor(id, player, spawn, flagShip) {
-        let shipClass = (flagShip) ? Fleet.SHIPCLASSES.FLAGSHIP : Fleet.SHIPCLASSES.COMMAND;
-        super(id, player, spawn, shipClass);
+    constructor(id, player, spawn) {
+        super(id, player, spawn, Fleet.SHIPCLASSES.COMMAND);
         this.value = 3;
     }
-    step(board, from, to) {
+    step(board, from, to) { return Movement.queenStep(this, board, from, to); }
+    canReach(to) { return Movement.queenCanReach(this, to); }
+}
+exports.Command = Command;
+class Flagship extends Ship {
+    constructor(id, player, spawn) {
+        super(id, player, spawn, Fleet.SHIPCLASSES.FLAGSHIP);
+        this.value = 5;
+    }
+    step(board, from, to) { return Movement.queenStep(this, board, from, to); }
+    canReach(to) { return Movement.queenCanReach(this, to); }
+}
+exports.Flagship = Flagship;
+class Movement {
+    static step(board, to) {
+        let target = board.getTile(to);
+        return target;
+    }
+    static queenStep(ship, board, from, to) {
         let target = undefined;
         let vector = [to[0] - from[0], to[1] - from[1]];
         if (vector[0] === 0 && vector[1] === 0) {
@@ -196,26 +220,29 @@ class Command extends Ship {
         }
         let magnitude = (vector[0] !== 0) ? Math.abs(vector[0]) : Math.abs(vector[1]);
         let normalVector = [vector[0] / magnitude, vector[1] / magnitude];
-        let targetCoord = [this.position.rowcol[0] + normalVector[0], this.position.rowcol[1] + normalVector[1]];
-        if ((this.position.rowcol[0] === from[0] && this.position.rowcol[1] === from[1]) ||
-            (this.position.ships.size === 1)) {
-            target = super.step(board, this.position.rowcol, targetCoord);
+        let targetCoord = [ship.position.rowcol[0] + normalVector[0], ship.position.rowcol[1] + normalVector[1]];
+        if ((ship.position.rowcol[0] === from[0] && ship.position.rowcol[1] === from[1]) ||
+            (ship.position.ships.size === 1)) {
+            target = Movement.step(board, targetCoord);
         }
         return target;
     }
-    canReach(to) {
-        let vector = [to[0] - this.position.rowcol[0], to[1] - this.position.rowcol[1]];
+    static canReach(ship, to) {
+        let vector = [to[0] - ship.position.rowcol[0], to[1] - ship.position.rowcol[1]];
+        return ((-1 <= vector[0] && vector[0] <= 1) && (-1 <= vector[1] && vector[1] <= 1));
+    }
+    static knightCanReach(ship, to) {
+        let vector = [to[0] - ship.position.rowcol[0], to[1] - ship.position.rowcol[1]];
+        let knightCanReach = ((-2 === vector[0] || vector[0] === 2) && (-1 === vector[1] || vector[1] === 1)) ||
+            ((-1 === vector[0] || vector[0] === 1) && (-2 === vector[1] || vector[1] === 2));
+        return knightCanReach || Movement.canReach(ship, to);
+    }
+    static queenCanReach(ship, to) {
+        let vector = [to[0] - ship.position.rowcol[0], to[1] - ship.position.rowcol[1]];
         return ((vector[0] === 0 || vector[1] === 0) ||
             (vector[0] === vector[1]) ||
             (vector[0] === -vector[1]));
     }
 }
-exports.Command = Command;
-class Flagship extends Command {
-    constructor(id, player, spawn) {
-        super(id, player, spawn, Fleet.SHIPCLASSES.FLAGSHIP);
-        this.value = 5;
-    }
-}
-exports.Flagship = Flagship;
+exports.Movement = Movement;
 //# sourceMappingURL=Ships.js.map

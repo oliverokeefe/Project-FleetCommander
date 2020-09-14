@@ -42,10 +42,12 @@ export class Tile {
     stageShip(ship) {
         this.stagedShips.set(ship.globalId, ship);
         ship.moveDelta = {
-            playerId: ship.playerId,
-            shipId: ship.id,
-            shipClass: ship.shipClass,
-            from: ship.position.rowcol,
+            ship: {
+                playerId: ship.playerId,
+                shipId: ship.id,
+                shipClass: ship.shipClass,
+                position: ship.position.rowcol,
+            },
             to: this.rowcol
         };
         this.shadowStagedShip(ship);
@@ -72,6 +74,30 @@ export class Tile {
     clearStagedShips() {
         this.stagedShips.clear();
         return;
+    }
+    /**
+     * Returns the difference between given player's ships and the amount of
+     * enemy ship and whether the tile contains hostile ships.
+     * @param playerId
+     * @returns BattleState object containing the ship difference and whether the tile has enemy ships
+     */
+    getBattleState(playerId) {
+        let battleState = {
+            shipDiff: 0,
+            hasEnemeyShips: false
+        };
+        this.ships.forEach((shipClass) => {
+            shipClass.forEach((ship) => {
+                if (ship.playerId === playerId) {
+                    battleState.shipDiff++;
+                }
+                else {
+                    battleState.shipDiff--;
+                    battleState.hasEnemeyShips = true;
+                }
+            });
+        });
+        return battleState;
     }
 }
 export class Board {

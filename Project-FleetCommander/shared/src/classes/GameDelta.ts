@@ -4,26 +4,26 @@ export interface ShipData {
     playerId: string;
     shipId: string;
     shipClass: string;
-    startLocation: coordinate;
+    position: coordinate;
 }
 
 export interface SpawnDelta {
-    playerId: string;
-    shipId: string;
-    on: coordinate;
+    ship: ShipData;
+    spawn: coordinate;
 }
 
 export interface MoveDelta {
-    playerId: string;
-    shipClass: string;
-    shipId: string;
-    from: coordinate;
+    ship: ShipData;
     to: coordinate;
 }
 
+export interface FollowDelta {
+    follower: ShipData;
+    target: ShipData;
+}
+
 export interface DestroyedDelta {
-    playerId: string;
-    shipId: string;
+    ship: ShipData
 }
 
 export interface ScoreDelta {
@@ -45,7 +45,7 @@ export interface ToClientDelta {
 }
 
 export interface InitialGameState {
-    ships: ShipData[];
+    ships: ShipData[]; //The initial position is treated as the ships spawn
     scores: ScoreDelta[];
     movePhase: string;
     board: string; // Currently unimplemented

@@ -38,44 +38,71 @@ class Player {
     }
     incrementalUpdate(board, movePhase) {
         if (this.actions) {
-            if (!this.shipsMoved) {
-                this.shipsMoved = new Map();
-            }
-            let movesFinished = true;
-            this.actions.moveAttempts.forEach((move) => {
-                if (move.playerId === this.id && move.shipClass === movePhase) {
-                    let moveFinished = this.fleet.ships.get(move.shipClass).get(move.shipId).move(board, move.from, move.to);
-                    if (moveFinished) {
-                        if (!this.shipsMoved.has(Ships_1.Ship.globalId(move.playerId, move.shipClass, move.shipId))) {
-                            this.shipsMoved.set(Ships_1.Ship.globalId(move.playerId, move.shipClass, move.shipId), this.fleet.ships.get(move.shipClass).get(move.shipId));
-                        }
-                    }
-                    else {
-                        movesFinished = false;
-                    }
-                }
-            });
+            let movesFinished = this.updatePositions(board, movePhase);
             if (movesFinished && !this.updateData) {
-                this.updateData = {
-                    spawns: [],
-                    moves: [],
-                    destroyed: [],
-                    scores: [],
-                    movePhase: ""
-                };
-                this.shipsMoved.forEach((ship) => {
-                    if (ship.moveDelta) {
-                        this.updateData.moves.push(ship.moveDelta);
-                        ship.moveDelta = undefined;
-                    }
-                });
-                //BC's
-                //points
-                //spawn
-                this.actions = undefined;
-                this.shipsMoved = undefined;
+                this.finalUpdate();
             }
         }
+        return;
+    }
+    finalUpdate() {
+        this.updateData = {
+            spawns: [],
+            moves: [],
+            destroyed: [],
+            scores: [],
+            movePhase: ""
+        };
+        this.shipsMoved.forEach((ship) => {
+            if (ship.moveDelta) {
+                this.updateData.moves.push(ship.moveDelta);
+                ship.moveDelta = undefined;
+            }
+        });
+        //Fleet Supply for move phase ships
+        this.updateSupply();
+        //Score
+        this.updateScore();
+        //spawns
+        this.spawnShips();
+        this.actions = undefined;
+        this.shipsMoved = undefined;
+        return;
+    }
+    updatePositions(board, movePhase) {
+        if (!this.shipsMoved) {
+            this.shipsMoved = new Map();
+        }
+        let movesFinished = true;
+        this.actions.moveAttempts.forEach((move) => {
+            if (move.ship.playerId === this.id && move.ship.shipClass === movePhase) {
+                let moveFinished = this.handleMove(move, board);
+                if (!moveFinished) {
+                    movesFinished = false;
+                }
+            }
+        });
+        return movesFinished;
+    }
+    handleMove(move, board) {
+        let moveFinished = this.fleet.ships.get(move.ship.shipClass).get(move.ship.shipId).move(board, move.ship.position, move.to);
+        if (moveFinished) {
+            if (!this.shipsMoved.has(Ships_1.Ship.globalId(move.ship.playerId, move.ship.shipClass, move.ship.shipId))) {
+                this.shipsMoved.set(Ships_1.Ship.globalId(move.ship.playerId, move.ship.shipClass, move.ship.shipId), this.fleet.ships.get(move.ship.shipClass).get(move.ship.shipId));
+            }
+        }
+        return moveFinished;
+    }
+    updateSupply() {
+        return;
+    }
+    updateScore() {
+        return;
+    }
+    spawnShips() {
+        return;
+    }
+    handleSpawn() {
         return;
     }
 }

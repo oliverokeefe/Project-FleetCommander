@@ -32,22 +32,36 @@ KEY:
 =: can ignore for now
 +: section good for now
 
+Battle Mechanics:
+    Movement:
+        1) Ships can move 1 in any direction when on a tile with at least one enemy ships
+        2) Ships can NOT move if outnumbered by 3 or more
+    Supply:
+        1) Ships lose 1 supply at the end of each round if on tile with at least one enemey ship
+        2) Ships lose 0 supply if outnumbering the opponent by 2 or more
+        3) Ships gain 1 supply at end of each round on tile with 0 enemy ships
 
 
 Things to Do:
-1) Add battle movement
-    1) Ship not allowed to move if at 'disadvatage' (that needs defining)
-    2) If not at 'disadvatage' (tied or advantage) can move 1 in any direction
-    3) follow mechanic
-2) BattleCounters
-    -destroying ships
-3) Spawning ships
-4) How will I handle multiple ships on the same tile?
+1) Supply
+    1) Ships are destroyed if they have 0 supply at the END of round
+    2) Ships gain 1 supply at END of the round if on tile with 0 enemy ships
+    3) Ships lose 1 supply at the END of the round if on tile with at least one enemey ship
+    4) Ships lose 0 supply if outnumbering the opponent by 2 or more
+        -Should destroy or supply calculate first?
+            -Destroy, that way supply accuratley reflects amount of rounds of combat a ship will survive
+2) Spawning ships
+    1) Need a player ship hud...
+        Div with list of:
+            -ShipClass ID [SPAWN BTN]
+            -btn disabled when ship is spawned, enabled when destroyed
+            -hover on btn will "highlight" the spawn location (Or could suggest() )
+3) How will I handle multiple ships on the same tile?
     ?? Can limit to 9 ships per tile for now... this will have to due atm
     -later- Black the tile, have a new tab on the side that has all
       the ships in it... that will be better than limiting, but this
     is going to be an issue with the choosen tools
-5) Scoring
+4) Scoring
 ------Game now testPlayable
 
 -Game Over

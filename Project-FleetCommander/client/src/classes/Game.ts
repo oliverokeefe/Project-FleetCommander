@@ -59,7 +59,7 @@ export class Game {
                         ship = new Ship.Pawn(
                             shipData.shipId,
                             shipData.playerId,
-                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                            this.Board.tiles[shipData.position[0]][shipData.position[1]]
                         );
                         break;
                     }
@@ -67,7 +67,7 @@ export class Game {
                         ship = new Ship.Knight(
                             shipData.shipId,
                             shipData.playerId,
-                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                            this.Board.tiles[shipData.position[0]][shipData.position[1]]
                         );
                         break;
                     }
@@ -75,7 +75,7 @@ export class Game {
                         ship = new Ship.Command(
                             shipData.shipId,
                             shipData.playerId,
-                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                            this.Board.tiles[shipData.position[0]][shipData.position[1]]
                         );
                         break;
                     }
@@ -83,7 +83,7 @@ export class Game {
                         ship = new Ship.Flagship(
                             shipData.shipId,
                             shipData.playerId,
-                            this.Board.tiles[shipData.startLocation[0]][shipData.startLocation[1]]
+                            this.Board.tiles[shipData.position[0]][shipData.position[1]]
                         );
                         break;
                     }
@@ -105,7 +105,7 @@ export class Game {
             this.Scoreboard.setMovePhase(data.movePhase);
             //moves
             data.moves.forEach((move) => {
-                let shipGlobalId: string = Ship.Ship.globalId(move.playerId, move.shipClass, move.shipId);
+                let shipGlobalId: string = Ship.Ship.globalId(move.ship.playerId, move.ship.shipClass, move.ship.shipId);
                 if(this.Board.ships.has(shipGlobalId)) {
                     this.Board.ships.get(shipGlobalId).move(move.to);
                 }
@@ -151,5 +151,9 @@ export class Game {
             }
         });
         return moves;
+    }
+
+    public getFollows(): Delta.FollowDelta[] {
+        return [];
     }
 }

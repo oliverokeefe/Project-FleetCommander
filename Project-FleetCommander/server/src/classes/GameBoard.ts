@@ -7,6 +7,10 @@ type board = Array<Array<Tile>>;
 // TODO Make a seperate server and client game board... this cannot be in shared...
 ///--------------------------------------------------
 
+export interface BattleState {
+    shipDiff: number;
+    hasEnemeyShips: boolean;
+}
 
 export class Tile {
 
@@ -33,6 +37,22 @@ export class Tile {
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
+    }
+
+    public getBattleState(playerId: string): BattleState {
+        let battleState: BattleState = {
+            shipDiff: 0,
+            hasEnemeyShips: false
+        };
+        this.ships.forEach((ship) => {
+            if(ship.playerId === playerId) {
+                battleState.shipDiff++;
+            } else {
+                battleState.shipDiff--;
+                battleState.hasEnemeyShips = true;
+            }
+        });
+        return battleState;
     }
 
 }
@@ -271,6 +291,14 @@ export class Board {
     public getTile(coordinate: coordinate): Tile {
         if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
             return this.board[coordinate[0]][coordinate[1]];
+        } else {
+            return undefined;
+        }
+    }
+
+    public getBattleStateOnTile(playerId: string, coordinate: coordinate): BattleState {
+        if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
+            return this.board[coordinate[0]][coordinate[1]].getBattleState(playerId);
         } else {
             return undefined;
         }

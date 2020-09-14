@@ -7,7 +7,10 @@ import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
 
 
-
+export interface BattleState {
+    shipDiff: number;
+    hasEnemeyShips: boolean;
+}
 
 
 
@@ -66,10 +69,12 @@ export class Tile {
     public stageShip(ship: Ship): void {
         this.stagedShips.set(ship.globalId, ship);
         ship.moveDelta = {
-            playerId: ship.playerId,
-            shipId: ship.id,
-            shipClass: ship.shipClass,
-            from: ship.position.rowcol,
+            ship: {
+                playerId: ship.playerId,
+                shipId: ship.id,
+                shipClass: ship.shipClass,
+                position: ship.position.rowcol,
+            },
             to: this.rowcol
         };
         this.shadowStagedShip(ship);
@@ -100,6 +105,30 @@ export class Tile {
     public clearStagedShips(): void {
         this.stagedShips.clear();
         return;
+    }
+
+    /**
+     * Returns the difference between given player's ships and the amount of
+     * enemy ship and whether the tile contains hostile ships.
+     * @param playerId 
+     * @returns BattleState object containing the ship difference and whether the tile has enemy ships
+     */
+    public getBattleState(playerId: string): BattleState {
+        let battleState: BattleState = {
+            shipDiff: 0,
+            hasEnemeyShips: false
+        };
+        this.ships.forEach((shipClass) => {
+            shipClass.forEach((ship) => {
+                if(ship.playerId === playerId) {
+                    battleState.shipDiff++;
+                } else {
+                    battleState.shipDiff--;
+                    battleState.hasEnemeyShips = true;
+                }
+            });
+        });
+        return battleState;
     }
 }
 

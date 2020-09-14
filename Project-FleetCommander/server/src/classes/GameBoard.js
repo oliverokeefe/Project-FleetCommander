@@ -1,9 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Board = exports.Territory = exports.Tile = void 0;
-///--------------------------------------------------
-// TODO Make a seperate server and client game board... this cannot be in shared...
-///--------------------------------------------------
 class Tile {
     constructor(rowcol, value, cluster) {
         this.rowcol = rowcol;
@@ -14,6 +11,22 @@ class Tile {
         this.ship = "";
         this.isSpawn = false;
         this.canBuildOn = false;
+    }
+    getBattleState(playerId) {
+        let battleState = {
+            shipDiff: 0,
+            hasEnemeyShips: false
+        };
+        this.ships.forEach((ship) => {
+            if (ship.playerId === playerId) {
+                battleState.shipDiff++;
+            }
+            else {
+                battleState.shipDiff--;
+                battleState.hasEnemeyShips = true;
+            }
+        });
+        return battleState;
     }
 }
 exports.Tile = Tile;
@@ -218,6 +231,14 @@ class Board {
     getTile(coordinate) {
         if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
             return this.board[coordinate[0]][coordinate[1]];
+        }
+        else {
+            return undefined;
+        }
+    }
+    getBattleStateOnTile(playerId, coordinate) {
+        if (this.board && this.validCoordinate(coordinate) && this.board[coordinate[0]] && this.board[coordinate[0]][coordinate[1]]) {
+            return this.board[coordinate[0]][coordinate[1]].getBattleState(playerId);
         }
         else {
             return undefined;

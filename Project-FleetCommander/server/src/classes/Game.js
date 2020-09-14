@@ -58,7 +58,7 @@ class Game {
                         playerId: ship.playerId,
                         shipId: ship.id,
                         shipClass: ship.shipClass,
-                        startLocation: ship.position.rowcol
+                        position: ship.position.rowcol
                     });
                 });
             });
@@ -195,6 +195,12 @@ class Game {
     }
     submitPlayerActions(id, data) {
         if (this.players.has(id) && !this.players.get(id).actions) {
+            if (!data) {
+                data = {
+                    spawnAttempts: [],
+                    moveAttempts: []
+                };
+            }
             this.players.get(id).actions = data;
         }
         return;
