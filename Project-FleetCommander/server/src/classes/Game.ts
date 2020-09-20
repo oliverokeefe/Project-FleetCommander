@@ -103,7 +103,7 @@ export class Game {
         let data: Delta.ToClientDelta = {
             spawns: [],
             moves: [],
-            destroyed: [],
+            supply: [],
             scores: [],
             movePhase: ""
         };
@@ -116,7 +116,7 @@ export class Game {
             if(player.updateData){
                 data.spawns = data.spawns.concat(player.updateData.spawns);
                 data.moves = data.moves.concat(player.updateData.moves);
-                data.destroyed = data.destroyed.concat(player.updateData.destroyed);
+                data.supply = data.supply.concat(player.updateData.supply);
                 data.scores = data.scores.concat(player.updateData.scores);
                 player.updateData = undefined;
             }

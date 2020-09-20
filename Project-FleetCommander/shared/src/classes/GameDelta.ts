@@ -22,8 +22,9 @@ export interface FollowDelta {
     target: ShipData;
 }
 
-export interface DestroyedDelta {
-    ship: ShipData
+export interface SupplyDelta {
+    ship: ShipData;
+    supply: number;
 }
 
 export interface ScoreDelta {
@@ -39,7 +40,7 @@ export interface FromClientDelta {
 export interface ToClientDelta {
     spawns: SpawnDelta[];
     moves: MoveDelta[];
-    destroyed: DestroyedDelta[];
+    supply: SupplyDelta[];
     scores: ScoreDelta[];
     movePhase: string;
 }

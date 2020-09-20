@@ -121,6 +121,7 @@ export abstract class Ship {
     public value: number;
     public moveDelta: MoveDelta;
     public moveFinished: boolean;
+    public supply: number;
 
     constructor(id: string, playerId: string, spawn: Tile, shipClass: string) {
         this.id = id;

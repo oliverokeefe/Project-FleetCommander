@@ -1,6 +1,6 @@
 import { Territory, Board } from "./GameBoard";
 import { Fleet, Ship } from "./Ships";
-import { DestroyedDelta, ToClientDelta, FromClientDelta, MoveDelta } from "../../../shared/src/classes/GameDelta";
+import { SupplyDelta, ToClientDelta, FromClientDelta, MoveDelta } from "../../../shared/src/classes/GameDelta";
 import { coordinate } from "../../../shared/src/types/types";
 
 
@@ -71,7 +71,7 @@ export class Player {
         this.updateData = {
             spawns: [],
             moves: [],
-            destroyed: [],
+            supply: [],
             scores: [],
             movePhase: ""
         };
