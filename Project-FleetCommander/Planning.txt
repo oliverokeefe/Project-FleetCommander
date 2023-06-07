@@ -70,7 +70,8 @@ Things to Do:
 
 
 
-
+Need to Create custom namespace for socket. (instead of bodging the SocketIO.Socket class itself) See:
+https://socket.io/docs/v4/typescript/#custom-types-for-each-namespace
 
 
 
