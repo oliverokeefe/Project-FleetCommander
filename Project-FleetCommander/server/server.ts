@@ -1,15 +1,26 @@
-import debug = require('debug');
-import express = require('express');
-import path = require('path');
+import express from 'express';
+import http from 'http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { joinData, gameList } from '../shared/src/types/types';
-import * as Delta from '../shared/src/classes/GameDelta';
-import { Server } from 'socket.io';
-import { Game, GameList } from './src/classes/Game';
+import { joinData, gameList } from '../shared/src/types/types.js';
+import * as Delta from '../shared/src/classes/GameDelta.js';
+import { Server, Socket } from 'socket.io';
+import { Game, GameList } from './src/classes/Game.js';
+import * as SocketEvents from '../shared/src/classes/SocketEvents.js';
+import { GameServer, PlayerSocket } from './src/classes/GameServer.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-let http = require('http').createServer(app);
-let io: SocketIO.Server = require('socket.io')(http);
+let httpServer = http.createServer(app);
+let io: GameServer = new Server<
+    SocketEvents.ClientToServerEvents,
+    SocketEvents.ServerToClientEvents,
+    SocketEvents.InterServerEvents,
+    SocketEvents.SocketData
+>(httpServer);
 
 //app.use((req, res, next) => {
 //    console.log(req.url);
@@ -58,9 +69,9 @@ function isValidJoinData(joinData: joinData): boolean {
     }
 }
 
-function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
+function addPlayerToLobby(socket: PlayerSocket, game?: string): void {
 
-    game = (game) ? game : socket.game;
+    game = (game) ? game : socket.data.game;
 
     if (!Games.gameExists(game)) {
         createNewGame(game);
@@ -70,17 +81,17 @@ function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
 
     if (playerId) {
 
-        socket.game = game;
-        socket.player = playerId;
+        socket.data.game = game;
+        socket.data.player = playerId;
 
-        sendMessage(socket.game, `${socket.player} has joined the lobby`);
+        sendMessage(socket.data.game, `${socket.data.player} has joined the lobby`);
 
-        socket.join(socket.game);
-        socket.emit('joinLobby', socket.game);
-        socket.emit('createPlayer', socket.player);
-        socket.emit('updateChat', Games.games[socket.game].chatLog);
+        socket.join(socket.data.game);
+        socket.emit('joinLobby', socket.data.game);
+        socket.emit('createPlayer', socket.data.player);
+        socket.emit('updateChat', Games.games[socket.data.game].chatLog);
 
-        console.log(`${socket.player} has joined the ${socket.game} lobby`);
+        console.log(`${socket.data.player} has joined the ${socket.data.game} lobby`);
 
     } else {
 
@@ -89,11 +100,11 @@ function addPlayerToLobby(socket: SocketIO.Socket, game?: string): void {
 
         Games.addSpectatorToGame(game);
 
-        socket.game = game;
-        socket.player = GenSpecId;
+        socket.data.game = game;
+        socket.data.player = GenSpecId;
 
-        socket.join(socket.game);
-        socket.emit('joinGameAsSpectator', socket.game, socket.player, Games.games[socket.game].board.board);
+        socket.join(socket.data.game);
+        socket.emit('joinGameAsSpectator', socket.data.game, socket.data.player, Games.games[socket.data.game].board.board);
 
     }
 
@@ -108,30 +119,30 @@ function createNewGame(game: string): void {
     return;
 }
 
-function removePlayerFromGame(socket: SocketIO.Socket, game?: string, player?: string): void {
+function removePlayerFromGame(socket: Socket, game?: string, player?: string): void {
 
-    game = (game) ? game : socket.game;
-    player = (player) ? player : socket.player;
+    game = (game) ? game : socket.data.game;
+    player = (player) ? player : socket.data.player;
 
     if (player === GenSpecId) {
 
         //remove spectator
 
-    } else if (Games.playerInGame(game, player) && socket.game && socket.player) {
+    } else if (Games.playerInGame(game, player) && socket.data.game && socket.data.player) {
         Games.removePlayerFromGame(game, player);
 
-        sendMessage(socket.game, `${socket.player} has left the game`)
+        sendMessage(socket.data.game, `${socket.data.player} has left the game`)
 
-        socket.leave(socket.game);
-        socket.game = "";
+        socket.leave(socket.data.game);
+        socket.data.game = "";
     }
 
 }
 
-function readyUp(socket: SocketIO.Socket, game?: string, playerId?: string): void {
+function readyUp(socket: Socket, game?: string, playerId?: string): void {
 
-    game = (game) ? game : socket.game;
-    playerId = (playerId) ? playerId : socket.player;
+    game = (game) ? game : socket.data.game;
+    playerId = (playerId) ? playerId : socket.data.player;
 
     if (Games.gameExists(game)) {
         Games.readyPlayerInGame(game, playerId);
@@ -157,10 +168,10 @@ function startGame(game: string): void {
     return;
 }
 
-function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelta, game?: string, playerId?: string): void {
+function submitPlayerActions(socket: Socket, data: Delta.FromClientDelta, game?: string, playerId?: string): void {
 
-    game = (game) ? game : socket.game;
-    playerId = (playerId) ? playerId : socket.player;
+    game = (game) ? game : socket.data.game;
+    playerId = (playerId) ? playerId : socket.data.player;
 
     console.log(`${playerId} submited data`);
     if(Games.gameExists(game)){
@@ -178,13 +189,13 @@ function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelt
 
 
 
-io.on('connection', (socket: SocketIO.Socket) => {
+io.on('connection', (socket: PlayerSocket) => {
     console.log('a user connected');
 
     ///Game init config on socket
     ///++++++++++++++++++++++++++++++++++++++++++++++++++
-    socket.player = "";
-    socket.game = "";
+    socket.data.player = "";
+    socket.data.game = "";
     ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
     socket.on('joinLobby', (game: string) => {
@@ -194,8 +205,8 @@ io.on('connection', (socket: SocketIO.Socket) => {
     });
 
     socket.on('chat', (message: string) => {
-        if (socket.game) {
-            sendMessage(socket.game, `${socket.player}-${message}`);
+        if (socket.data.game) {
+            sendMessage(socket.data.game, `${socket.data.player}-${message}`);
         }
         else {
             socket.emit('chat', message);
@@ -216,7 +227,7 @@ io.on('connection', (socket: SocketIO.Socket) => {
 
 
     socket.on('disconnect', () => {
-        if (socket.game) {
+        if (socket.data.game) {
             removePlayerFromGame(socket);
         }
         console.log('user disconnected');
@@ -244,9 +255,10 @@ app.use((err, req, res, next) => {
     res.send("respond with a BLANK resource");
 });
 
-app.set('port', process.env.PORT || 3000);
+// app.set('port', process.env.PORT || 3000);
+app.set('port', 3000);
 
-const server = http.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
-    console.log("Server listeneing on port" + server.address().port);
+const server = httpServer.listen(app.get('port'), function () {
+    // console.log("Server listeneing on port" + server.address().port);
+    console.log("Server listeneing on port 3000");
 });

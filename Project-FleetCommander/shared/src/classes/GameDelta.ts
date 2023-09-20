@@ -1,4 +1,4 @@
-import { coordinate } from "../types/types";
+import { coordinate } from "../types/types.js";
 
 export interface ShipData {
     playerId: string;

@@ -1,5 +1,5 @@
 import { socket, Game } from './MainModel.js';
-import { coordinate } from "../../../shared/src/types/types";
+import { coordinate } from "../../../shared/src/types/types.js";
 import { Ship, Pawn, Knight, Command, Flagship } from "./Ships.js";
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
 

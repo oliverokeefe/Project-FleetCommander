@@ -5,7 +5,14 @@
         <meta charset="utf-8" />
         <title>Create Game</title>
         <link rel="stylesheet" href="/styles/main.css" />
-        <script src="/socket.io/socket.io.js"></script>
+        <!-- <script src="/socket.io/socket.io.js"></script> -->
+        <script type="importmap">
+            {
+              "imports": {
+                "socket.io-client": "https://cdn.socket.io/4.7.2/socket.io.esm.min.js"
+              }
+            }
+          </script>
         <script type="module" src="/scripts/client/src/scripts/main.js"></script>
     </head>
     <body>

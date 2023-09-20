@@ -2,7 +2,7 @@
 import { socket } from './MainModel.js';
 import { Scoreboard } from './Scoreboard.js' 
 import { ShipInfo } from './ShipInfo.js';
-import { Board } from './Gameboard.js';
+import { Board } from './GameBoard.js';
 import { Player } from './Player.js';
 import * as Ship from './Ships.js'
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
