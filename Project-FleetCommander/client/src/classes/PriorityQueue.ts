@@ -1,7 +1,7 @@
 
 
 
-import type { comparator } from '../../../shared/src/types/types';
+import type { comparator } from '../../../shared/src/types/types.js';
 
 export class PriorityQueue {
 

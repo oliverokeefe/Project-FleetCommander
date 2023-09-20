@@ -1,7 +1,7 @@
-import { Player } from "./Player";
-import { Board } from "./GameBoard";
-import * as Delta from '../../../shared/src/classes/GameDelta';
-import { Ship, Fleet } from "./Ships";
+import { Player } from "./Player.js";
+import { Board } from "./GameBoard.js";
+import * as Delta from '../../../shared/src/classes/GameDelta.js';
+import { Ship, Fleet } from "./Ships.js";
 
 /**
  * Send to cliet to update game

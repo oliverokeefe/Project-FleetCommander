@@ -1,9 +1,11 @@
 import { ConfigSection } from "./ConfigSection.js";
 import { Lobby } from "./Lobby.js";
 import { Game as GameModel } from "./Game.js";
+import { ClientToServerEvents, ServerToClientEvents } from "../../../shared/src/classes/SocketEvents.js";
+import { io, Socket } from "socket.io-client";
 
 
-export let socket: SocketIOClient.Socket;
+export let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 export let ConfigSectionModel: ConfigSection;
 export let LobbyModel: Lobby;
 export let Game: GameModel;

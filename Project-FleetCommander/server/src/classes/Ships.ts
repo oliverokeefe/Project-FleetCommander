@@ -1,9 +1,9 @@
 
-import { coordinate } from '../../../shared/src/types/types';
-import { Board, Tile, Territory } from './GameBoard';
-import { Player } from './Player';
-import { X_OK } from 'constants';
-import { MoveDelta } from '../../../shared/src/classes/GameDelta';
+import { coordinate } from '../../../shared/src/types/types.js';
+import { Board, Tile, Territory } from './GameBoard.js';
+import { Player } from './Player.js';
+import { MoveDelta } from '../../../shared/src/classes/GameDelta.js';
+// import { X_OK } from 'constants';
 
 
 export class ShipList {

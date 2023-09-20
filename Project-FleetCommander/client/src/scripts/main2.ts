@@ -1,9 +1,10 @@
 
-import type { joinData, game, coordinate } from '../../../shared/src/types/types';
+import { Socket, io } from 'socket.io-client';
+import type { joinData, game, coordinate } from '../../../shared/src/types/types.js';
 
 
 
-let socket: SocketIOClient.Socket = undefined;
+let socket: Socket = undefined;
 
 
 let gameBoardDiv: HTMLDivElement = undefined;

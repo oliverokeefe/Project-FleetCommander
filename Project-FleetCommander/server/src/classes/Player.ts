@@ -1,7 +1,7 @@
-import { Territory, Board } from "./GameBoard";
-import { Fleet, Ship } from "./Ships";
-import { SupplyDelta, ToClientDelta, FromClientDelta, MoveDelta } from "../../../shared/src/classes/GameDelta";
-import { coordinate } from "../../../shared/src/types/types";
+import { Territory, Board } from "./GameBoard.js";
+import { Fleet, Ship } from "./Ships.js";
+import { SupplyDelta, ToClientDelta, FromClientDelta, MoveDelta } from "../../../shared/src/classes/GameDelta.js";
+import { coordinate } from "../../../shared/src/types/types.js";
 
 
 

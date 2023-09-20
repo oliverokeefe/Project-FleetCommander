@@ -1,17 +1,26 @@
-import debug = require('debug');
-import express = require('express');
-import path = require('path');
+import express from 'express';
+import http from 'http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { joinData, gameList } from '../shared/src/types/types';
-import * as Delta from '../shared/src/classes/GameDelta';
-import { Server } from 'socket.io';
-import { Game, GameList } from './src/classes/Game';
-import { PlayerSocket } from './src/classes/PlayerSocket';
-import { read } from 'fs';
+import { joinData, gameList } from '../shared/src/types/types.js';
+import * as Delta from '../shared/src/classes/GameDelta.js';
+import { Server, Socket } from 'socket.io';
+import { Game, GameList } from './src/classes/Game.js';
+import * as SocketEvents from '../shared/src/classes/SocketEvents.js';
+import { GameServer, PlayerSocket } from './src/classes/GameServer.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-let http = require('http').createServer(app);
-let io: SocketIO.Server = require('socket.io')(http);
+let httpServer = http.createServer(app);
+let io: GameServer = new Server<
+    SocketEvents.ClientToServerEvents,
+    SocketEvents.ServerToClientEvents,
+    SocketEvents.InterServerEvents,
+    SocketEvents.SocketData
+>(httpServer);
 
 //app.use((req, res, next) => {
 //    console.log(req.url);
@@ -28,9 +37,11 @@ app.use(express.static(path.join(__dirname, '../client/public')));
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 let Games: GameList = new GameList();
-let PlayerSockets: Map<string, PlayerSocket> = new Map<string, PlayerSocket>();
 
-let spectatorId: string = "Spectator";
+/**
+ * General spectator ID
+ */
+let GenSpecId: string = "Spectator";
 
 //let testBoard: Board = new Board();
 //console.log(testBoard.toString());
@@ -42,11 +53,6 @@ let spectatorId: string = "Spectator";
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function sendMessage(game: string, message: string) {
-
-    if (!game || !message) {
-        console.error("missing args: sendMessage");
-    }
-
     if (Games.gameExists(game)) {
         Games.games[game].chatLog.push(message);
         io.to(game).emit('chat', message);
@@ -63,39 +69,46 @@ function isValidJoinData(joinData: joinData): boolean {
     }
 }
 
-function addPlayerToLobby(socket: SocketIO.Socket, game: string): string {
+function addPlayerToLobby(socket: PlayerSocket, game?: string): void {
 
-    if (!socket || !game) {
-        console.error("missing args: addPlayerToLobby");
-    }
+    game = (game) ? game : socket.data.game;
 
     if (!Games.gameExists(game)) {
         createNewGame(game);
     }
 
-    let player: string = Games.tryAddPlayerToGame(game);
+    let playerId: string = Games.tryAddPlayerToGame(game);
 
-    if (player) {
+    if (playerId) {
 
-        sendMessage(game, `${player} has joined the lobby`);
+        socket.data.game = game;
+        socket.data.player = playerId;
 
-        socket.join(game);
-        socket.emit('joinLobby', game);
-        socket.emit('createPlayer', player);
-        socket.emit('updateChat', Games.games[game].chatLog);
+        sendMessage(socket.data.game, `${socket.data.player} has joined the lobby`);
 
-        console.log(`${player} has joined the ${game} lobby`);
+        socket.join(socket.data.game);
+        socket.emit('joinLobby', socket.data.game);
+        socket.emit('createPlayer', socket.data.player);
+        socket.emit('updateChat', Games.games[socket.data.game].chatLog);
+
+        console.log(`${socket.data.player} has joined the ${socket.data.game} lobby`);
+
     } else {
+
         //Add as Spectator
         //Should look the same as above but with a call to Game.addAsSpectator()
-        player = spectatorId;
+
         Games.addSpectatorToGame(game);
-        socket.join(game);
-        socket.emit('joinGameAsSpectator', game, player, Games.games[game].board.board);
+
+        socket.data.game = game;
+        socket.data.player = GenSpecId;
+
+        socket.join(socket.data.game);
+        socket.emit('joinGameAsSpectator', socket.data.game, socket.data.player, Games.games[socket.data.game].board.board);
 
     }
 
-    return player;
+    return;
 }
 
 
@@ -106,33 +119,30 @@ function createNewGame(game: string): void {
     return;
 }
 
-function removePlayerFromGame(socket: SocketIO.Socket, game: string, player: string): void {
+function removePlayerFromGame(socket: Socket, game?: string, player?: string): void {
 
-    if (!socket || !game || !player) {
-        console.error("missing args: removePlayerFromGame");
-    }
+    game = (game) ? game : socket.data.game;
+    player = (player) ? player : socket.data.player;
 
-    if (player === spectatorId) {
+    if (player === GenSpecId) {
 
         //remove spectator
 
-    } else if (Games.playerInGame(game, player) && game && player) {
+    } else if (Games.playerInGame(game, player) && socket.data.game && socket.data.player) {
         Games.removePlayerFromGame(game, player);
 
-        sendMessage(game, `${player} has left the game`)
+        sendMessage(socket.data.game, `${socket.data.player} has left the game`)
 
-        socket.leave(game);
+        socket.leave(socket.data.game);
+        socket.data.game = "";
     }
-
-    //Also remove PlayerSocket from list
 
 }
 
-function readyUp(socket: SocketIO.Socket, game: string, playerId: string): void {
+function readyUp(socket: Socket, game?: string, playerId?: string): void {
 
-    if (!socket || !game || !playerId) {
-        console.error("missing args: readyUp");
-    }
+    game = (game) ? game : socket.data.game;
+    playerId = (playerId) ? playerId : socket.data.player;
 
     if (Games.gameExists(game)) {
         Games.readyPlayerInGame(game, playerId);
@@ -158,11 +168,10 @@ function startGame(game: string): void {
     return;
 }
 
-function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelta, game: string, playerId: string): void {
+function submitPlayerActions(socket: Socket, data: Delta.FromClientDelta, game?: string, playerId?: string): void {
 
-    if (!socket || !game || !playerId) {
-        console.error("missing args: submitPlayerActions");
-    }
+    game = (game) ? game : socket.data.game;
+    playerId = (playerId) ? playerId : socket.data.player;
 
     console.log(`${playerId} submited data`);
     if(Games.gameExists(game)){
@@ -175,33 +184,54 @@ function submitPlayerActions(socket: SocketIO.Socket, data: Delta.FromClientDelt
     return;
 }
 
-function cleanup(socket: SocketIO.Socket): void {
-
-    PlayerSockets.delete(socket.id);
-
-    return;
-}
-
 ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
 
-io.on('connection', (socket: SocketIO.Socket) => {
+io.on('connection', (socket: PlayerSocket) => {
     console.log('a user connected');
 
-    let playerSocket = new PlayerSocket(
-        socket,
-        addPlayerToLobby,
-        sendMessage,
-        readyUp,
-        submitPlayerActions,
-        removePlayerFromGame,
-        cleanup
-    );
+    ///Game init config on socket
+    ///++++++++++++++++++++++++++++++++++++++++++++++++++
+    socket.data.player = "";
+    socket.data.game = "";
+    ///++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    //Add object to some list and remove it on disconnects
-    PlayerSockets.set(socket.id, playerSocket);
+    socket.on('joinLobby', (game: string) => {
+        if (game) {
+            addPlayerToLobby(socket, game);
+        }
+    });
+
+    socket.on('chat', (message: string) => {
+        if (socket.data.game) {
+            sendMessage(socket.data.game, `${socket.data.player}-${message}`);
+        }
+        else {
+            socket.emit('chat', message);
+        }
+    });
+
+    socket.on('ready', () => {
+        readyUp(socket);
+    });
+
+    socket.on('submitActions', (data: Delta.FromClientDelta) => {
+        submitPlayerActions(socket, data);
+    });
+
+    socket.on('leaveGame', () => {
+        removePlayerFromGame(socket);
+    });
+
+
+    socket.on('disconnect', () => {
+        if (socket.data.game) {
+            removePlayerFromGame(socket);
+        }
+        console.log('user disconnected');
+    });
 });
 
 
@@ -225,9 +255,10 @@ app.use((err, req, res, next) => {
     res.send("respond with a BLANK resource");
 });
 
-app.set('port', process.env.PORT || 3000);
+// app.set('port', process.env.PORT || 3000);
+app.set('port', 3000);
 
-const server = http.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
-    console.log("Server listeneing on port" + server.address().port);
+const server = httpServer.listen(app.get('port'), function () {
+    // console.log("Server listeneing on port" + server.address().port);
+    console.log("Server listeneing on port 3000");
 });

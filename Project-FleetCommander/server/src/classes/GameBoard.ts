@@ -1,8 +1,9 @@
-import { coordinate } from "../../../shared/src/types/types";
-import { stringify } from "querystring";
-import { Ship } from "./Ships";
+import { coordinate } from "../../../shared/src/types/types.js";
+// import { stringify } from "querystring";
+import { Ship } from "./Ships.js";
 
-type board = Array<Array<Tile>>;
+
+export type board = Array<Array<Tile>>;
 ///--------------------------------------------------
 // TODO Make a seperate server and client game board... this cannot be in shared...
 ///--------------------------------------------------

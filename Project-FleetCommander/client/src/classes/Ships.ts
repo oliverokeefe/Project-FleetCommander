@@ -1,6 +1,6 @@
 
 import { socket, Game } from './MainModel.js';
-import type { coordinate } from '../../../shared/src/types/types';
+import type { coordinate } from '../../../shared/src/types/types.js';
 import { Board, Tile } from './GameBoard.js';
 import * as Delta from '../../../shared/src/classes/GameDelta.js';
 
